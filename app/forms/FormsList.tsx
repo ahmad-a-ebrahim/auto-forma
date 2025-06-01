@@ -30,9 +30,12 @@ const FormsList = (props: Props) => {
               {form.description}
             </CardDescription>
           </CardHeader>
-          <CardFooter>
+          <CardFooter className='flex flex-col gap-2'>
             <Link className="w-full" href={`/forms/edit/${form.id}`}>
               <Button className='w-full' size="sm">View</Button>
+            </Link>
+            <Link className="w-full" href={`/results?formId=${form.id}`}>
+              <Button variant="secondary" className='w-full' size="sm">Results</Button>
             </Link>
           </CardFooter>
         </Card>
