@@ -5,8 +5,8 @@ import LandingPage from './landing-page';
 export default function Home() {
   return (
     <SessionProvider>
-      <Header />
-      <main className="flex min-h-screen flex-col items-center">
+      <main className="flex min-h-dvh flex-col">
+        <Header />
         <LandingPage />
       </main>
     </SessionProvider>

@@ -3,6 +3,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { Button } from './button';
 import Image from 'next/image';
 import Link from 'next/link';
+import logo from "@/public/logo.png"
 
 type Props = {}
 
@@ -24,7 +25,7 @@ const Header = async (props: Props) => {
     <header className='border bottom-1'>
       <nav className='bg-white border-gray-200 px-4 py-2.5'>
         <div className='flex flex-wrap justify-between items-center mx-auto max-w-screen-xl'>
-          <h1 className='font-[600] text-sm'>AutoForma</h1>
+          <Image src={logo} alt="Logo" className='w-20 rounded-md' />
           <div>
             {
               session?.user ? (

@@ -31,10 +31,10 @@ export default async function AdminLayout({ children }: {
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen flex-col space-y-6">
+    <div className="flex min-h-dvh flex-col space-y-6">
       <Header />
       <div className="flex gap-1 sm:gap-2 flex-1 relative">
-        <aside className="px-2 border-r top-0 left-0 sticky h-screen">
+        <aside className="px-2 border-r top-0 left-0 sticky h-dvh">
           <DashboardNav items={dashboardConfig.sidebarNav} />
           <UpgradeAccBtn />
         </aside>

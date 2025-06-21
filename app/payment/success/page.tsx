@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react'
 
 const page = () => {
   return (
-    <div className='flex justify-center items-center min-h-screen'>
+    <div className='flex justify-center items-center min-h-dvh'>
       <Alert variant="default" className='max-w-md'>
         <AlertTitle className='text-center text-lg font-[500] flex flex-col gap-2 items-center justify-center'>
           <CheckCircle2 className='text-green-600 h-8 w-8' />

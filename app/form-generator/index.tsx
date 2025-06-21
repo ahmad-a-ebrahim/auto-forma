@@ -13,7 +13,7 @@ import { generateForm } from '@/app/actions/generateForm';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useSession, signIn } from "next-auth/react";
 import { navigate } from '../actions/navigateToForm';
-import { Plus } from 'lucide-react';
+import { Plus, PlusCircle } from 'lucide-react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 
 type Props = {
@@ -61,7 +61,7 @@ const FormGenerator = (props: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button onClick={onFormCreate} size={props.size} variant={props.variant}>
-        <Plus className='w-4 h-4 mr-2' />
+        <PlusCircle className='w-4 h-4 mr-2' />
         Create form
       </Button>
       <DialogContent className='sm:max-w-[425px]'>
