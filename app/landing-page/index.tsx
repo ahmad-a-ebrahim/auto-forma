@@ -1,6 +1,7 @@
 import React from 'react'
 import FormGenerator from '../form-generator'
 import DotGrid from '@/components/blocks/Backgrounds/DotGrid/DotGrid'
+import UserSubscriptionWrapper from '../form-generator/UserSubscriptionWrapper'
 
 type Props = {}
 
@@ -30,7 +31,9 @@ const LandingPage = (props: Props) => {
         <p className='max-w-[700px] mt-4 text-center text-gray-500 md:text-xl font-[500]'>
           Create, distribute, and analyze your form effortlessly with AI, unlocking powerful insights and data-driven decisions in real time.
         </p>
-        <FormGenerator size={"lg"} />
+        <UserSubscriptionWrapper>
+          <FormGenerator size={"lg"} />
+        </UserSubscriptionWrapper>
       </div>
     </section>
   )

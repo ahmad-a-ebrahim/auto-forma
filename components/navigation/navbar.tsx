@@ -18,7 +18,7 @@ const DashboardNav = ({ items }: DashboardNavProps) => {
   if (!items?.length) return null;
 
   return (
-    <nav className='flex flex-col gap-1'>
+    <nav className='flex flex-col gap-2'>
       {items.map((item, index) => {
           const Icon = Icons[item?.icon || "list"];
           const isActive = path === item.href;

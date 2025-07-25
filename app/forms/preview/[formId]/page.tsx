@@ -2,7 +2,7 @@ import React from "react";
 import { db } from "@/db";
 import { forms } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import Form from "../Form";
+import Form from "../../Form";
 
 const page = async ({
   params,
@@ -32,7 +32,7 @@ const page = async ({
     return <div>Form not found</div>;
   }
 
-  return <Form form={form} />;
+  return <Form form={form} previewMode={true} />;
 };
 
 export default page;

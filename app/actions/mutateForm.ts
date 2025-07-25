@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { forms, questions as dbQuestions, fieldOptions } from "@/db/schema";
 import { auth } from "@/auth";
 import { InferInsertModel, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 type Form = InferInsertModel<typeof forms>;
 type Question = InferInsertModel<typeof dbQuestions>;
@@ -62,4 +63,5 @@ export async function saveForm(data: SaveFormData) {
 
 export async function publishForm(formId: number) {
   await db.update(forms).set({ published: true }).where(eq(forms.id, formId));
+  revalidatePath("/");
 }
