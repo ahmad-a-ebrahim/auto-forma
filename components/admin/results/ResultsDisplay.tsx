@@ -1,5 +1,5 @@
 import React from "react";
-import { Table } from "./Table";
+import { ResultsTable } from "./ResultsTable";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { forms } from "@/db/schema";
@@ -37,10 +37,9 @@ const ResultsDisplay = async ({ formId }: Props) => {
       <p className="w-full text-center">No submissions on this form yet!</p>
     );
 
-  console.log("form", form);
   return (
     <div>
-      <Table data={form.submissions} columns={form.questions} />
+      <ResultsTable data={form.submissions} columns={form.questions} />
     </div>
   );
 };

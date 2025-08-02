@@ -1,42 +1,41 @@
 import { db } from "@/db";
-import {
-  forms,
-  formSubmissions,
-  answers as dbAnswers,
-} from "@/db/schema";
+import { formSubmissions, answers as dbAnswers } from "@/db/schema";
 
-export async function POST(
-  request: Request
-): Promise<Response> {
-  const data = await request.json();
+export async function POST(request: Request): Promise<Response> {
+  try {
+    const data = await request.json();
 
-  const newFormSubmission = await db
-    .insert(formSubmissions)
-    .values({
-      formId: data.formId,
-    })
-    .returning({
-      insertedId: formSubmissions.id,
-    });
-  const [{ insertedId }] =
-    newFormSubmission;
+    // validation
+    if (!data.formId || !Array.isArray(data.answers)) {
+      return Response.json({ error: "Invalid request data" }, { status: 400 });
+    }
 
-  await db.transaction(async (tx) => {
-    for (const answer of data.answers) {
-      const [{ answerId }] = await tx
-        .insert(dbAnswers)
-        .values({
+    const newFormSubmission = await db
+      .insert(formSubmissions)
+      .values({
+        formId: data.formId,
+      })
+      .returning({
+        insertedId: formSubmissions.id,
+      });
+
+    const [{ insertedId }] = newFormSubmission;
+
+    await db.transaction(async (tx) => {
+      for (const answer of data.answers) {
+        await tx.insert(dbAnswers).values({
           formSubmissionId: insertedId,
           ...answer,
-        })
-        .returning({
-          answerId: dbAnswers.id,
         });
-    }
-  });
+      }
+    });
 
-  return Response.json(
-    { formSubmissionsId: insertedId },
-    { status: 200 }
-  );
+    return Response.json({ formSubmissionId: insertedId }, { status: 200 });
+  } catch (err) {
+    console.error("Error creating form submission:", err);
+    return Response.json(
+      { error: "Something went wrong while saving your answers." },
+      { status: 500 }
+    );
+  }
 }

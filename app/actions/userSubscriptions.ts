@@ -9,17 +9,17 @@ export async function createSubscription({
 }: {
   stripeCustomerId: string;
 }) {
-  await db
-    .update(users)
-    .set({
-      subscribed: true,
-    })
-    .where(
-      eq(
-        users.stripeCustomerId,
-        stripeCustomerId
-      )
-    );
+  try {
+    await db
+      .update(users)
+      .set({
+        subscribed: true,
+      })
+      .where(eq(users.stripeCustomerId, stripeCustomerId));
+  } catch (err) {
+    console.error("Error creating subscription:", err);
+    throw new Error("Failed to create subscription.");
+  }
 }
 
 export async function deleteSubscription({
@@ -27,28 +27,28 @@ export async function deleteSubscription({
 }: {
   stripeCustomerId: string;
 }) {
-  await db
-    .update(users)
-    .set({
-      subscribed: false,
-    })
-    .where(
-      eq(
-        users.stripeCustomerId,
-        stripeCustomerId
-      )
-    );
+  try {
+    await db
+      .update(users)
+      .set({
+        subscribed: false,
+      })
+      .where(eq(users.stripeCustomerId, stripeCustomerId));
+  } catch (err) {
+    console.error("Error deleting subscription:", err);
+    throw new Error("Failed to delete subscription.");
+  }
 }
 
-export async function getUserSubscription({
-  userId,
-}: {
-  userId: string;
-}) {
-  const user =
-    await db.query.users.findFirst({
+export async function getUserSubscription({ userId }: { userId: string }) {
+  try {
+    const user = await db.query.users.findFirst({
       where: eq(users.id, userId),
     });
 
-  return user?.subscribed;
+    return user?.subscribed ?? false;
+  } catch (err) {
+    console.error("Error fetching user subscription:", err);
+    return false;
+  }
 }

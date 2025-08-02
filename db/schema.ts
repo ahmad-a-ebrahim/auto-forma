@@ -103,6 +103,7 @@ export const questions = pgTable("questions", {
   text: text("text"),
   fieldType: formElements("field_type"),
   formId: integer("form_id"),
+  required: boolean("required").default(false).notNull(),
 });
 
 export const questionsRelations =

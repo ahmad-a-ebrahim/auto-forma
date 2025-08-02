@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { generateForm } from "@/app/actions/generateForm";
 import { useFormState, useFormStatus } from "react-dom";
 import { useSession, signIn } from "next-auth/react";
-import { navigate } from "../actions/navigateToForm";
+import { navigate } from "../../../app/actions/navigateToForm";
 import { PlusCircle } from "lucide-react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import Link from "next/link";

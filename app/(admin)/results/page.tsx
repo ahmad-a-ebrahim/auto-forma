@@ -1,18 +1,18 @@
-import React from 'react'
-import ResultsDisplay from './ResultsDisplay'
+import React from "react";
+import ResultsDisplay from "@/components/admin/results/ResultsDisplay";
 
-type Props = {}
-
-const page = async ({ searchParams }: {
+const ResultsPage = async ({
+  searchParams,
+}: {
   searchParams: {
-    [key: string]: string | string[] | undefined
-  }
+    [key: string]: string | string[] | undefined;
+  };
 }) => {
   return (
-    <div className='p-2 sm:p-4'>
+    <div className="p-2 sm:p-4">
       <ResultsDisplay formId={parseInt(searchParams.formId as string)} />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default ResultsPage;

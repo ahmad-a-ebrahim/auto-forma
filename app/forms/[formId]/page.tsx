@@ -2,9 +2,9 @@ import React from "react";
 import { db } from "@/db";
 import { forms } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import Form from "../Form";
+import Form from "@/components/forms/Form";
 
-const page = async ({
+const SubmitFormPage = async ({
   params,
 }: {
   params: {
@@ -32,7 +32,25 @@ const page = async ({
     return <div>Form not found</div>;
   }
 
-  return <Form form={form} />;
+  const sanitizedForm = {
+    ...form,
+    name: form.name ?? "",
+    description: form.description ?? "",
+    published: form.published ?? false,
+    questions: form.questions.map((q) => ({
+      ...q,
+      text: q.text ?? "",
+      fieldType: q.fieldType ?? "Input",
+      fieldOptions: q.fieldOptions.map((opt) => ({
+        id: opt.id ?? 0,
+        questionId: opt.questionId ?? 0,
+        text: opt.text ?? "",
+        value: opt.value ?? "",
+      })),
+    })),
+  };
+
+  return <Form form={sanitizedForm} />;
 };
 
-export default page;
+export default SubmitFormPage;

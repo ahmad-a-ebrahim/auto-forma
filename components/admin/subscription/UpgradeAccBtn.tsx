@@ -1,17 +1,12 @@
 import React from "react";
 import { getUserForms } from "@/app/actions/getUserForms";
 import { MAX_FREE_FORMS } from "@/lib/utils";
-import ProgressBar from "../progressBar";
-import SubscribeBtn from "@/app/subscription/SubscribeBtn";
+import SubscribeBtn from "@/components/admin/subscription/SubscribeBtn";
 import { auth } from "@/auth";
 import { getUserSubscription } from "@/app/actions/userSubscriptions";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
-import { WalletCards } from "lucide-react";
+import ProgressBar from "@/components/progressBar";
 
-type Props = {};
-
-const UpgradeAccBtn = async (props: Props) => {
+const UpgradeAccBtn = async () => {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -36,7 +31,9 @@ const UpgradeAccBtn = async (props: Props) => {
       <ProgressBar value={percent} />
       <div className="leading-6">
         <p>
-          {formCount > 3 ? "You've hit your free plan" : `${formCount} out of ${MAX_FREE_FORMS} forms generated.`}
+          {formCount > 3
+            ? "You've hit your free plan"
+            : `${formCount} out of ${MAX_FREE_FORMS} forms generated.`}
         </p>
         <p>
           <SubscribeBtn

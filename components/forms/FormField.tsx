@@ -18,7 +18,7 @@ import {
   QuestionSelectModel,
   FieldOptionSelectModel,
 } from "@/types/form-types";
-import { Delete, Minus, X } from "lucide-react";
+import { Minus } from "lucide-react";
 
 type Props = {
   element: QuestionSelectModel & { fieldOptions: FieldOptionSelectModel[] };
@@ -45,7 +45,7 @@ const FormField: React.FC<Props> = ({
       onChange({ ...element, fieldOptions: opts });
     };
 
-    // Add Option handler - added functionality
+    // Add Option handler
     const addOption = () =>
       onChange({
         ...element,
@@ -55,7 +55,7 @@ const FormField: React.FC<Props> = ({
         ],
       });
 
-    // Delete Option handler - added functionality
+    // Delete Option handler
     const deleteOption = (idx: number) => {
       const opts = [...element.fieldOptions];
       opts.splice(idx, 1);
@@ -65,12 +65,12 @@ const FormField: React.FC<Props> = ({
     return (
       <div className="space-y-2">
         <Input
-          value={element.text}
+          value={element.text as string}
           onChange={(e) => onChange({ ...element, text: e.target.value })}
           placeholder="Question text"
         />
         <Select
-          value={element.fieldType}
+          value={element.fieldType as string}
           onValueChange={(val) => onChange({ ...element, fieldType: val })}
         >
           <SelectTrigger>
@@ -93,16 +93,16 @@ const FormField: React.FC<Props> = ({
             {element.fieldOptions.map((opt, idx) => (
               <div key={idx} className="flex gap-2 items-center">
                 <Input
-                  value={opt.text}
+                  value={opt.text as string}
                   onChange={(e) => updateOption(idx, "text", e.target.value)}
                   placeholder="Option Text"
                 />
                 <Input
-                  value={opt.value}
+                  value={opt.value as string}
                   onChange={(e) => updateOption(idx, "value", e.target.value)}
                   placeholder="Option Value"
                 />
-                {/* Delete Option button - added functionality */}
+                {/* Delete Option button */}
                 <Button
                   size={"icon"}
                   type="button"
@@ -114,7 +114,7 @@ const FormField: React.FC<Props> = ({
                 </Button>
               </div>
             ))}
-            {/* Add Option button - added functionality */}
+            {/* Add Option button */}
             <Button type="button" variant="outline" onClick={addOption}>
               + Add Option
             </Button>

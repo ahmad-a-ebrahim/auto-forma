@@ -12,46 +12,34 @@ const relevantEvents = new Set([
   "customer.subscription.created",
 ]);
 
-export async function POST(
-  req: Request
-) {
+export async function POST(req: Request) {
   const body = await req.text();
-  const sig = req.headers.get(
-    "stripe-signature"
-  ) as string;
-  if (
-    !process.env.STRIPE_WEBHOOK_LOCAL_SECRET
-  ) {
-    throw new Error(
-      "STRIPE_WEBHOOK_LOCAL_SECRET is not set"
-    );
+  const sig = req.headers.get("stripe-signature") as string;
+  if (!process.env.STRIPE_WEBHOOK_LOCAL_SECRET) {
+    throw new Error("STRIPE_WEBHOOK_LOCAL_SECRET is not set");
   }
 
   if (!sig) return;
 
-  const event =
-    stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_LOCAL_SECRET
-    );
+  const event = stripe.webhooks.constructEvent(
+    body,
+    sig,
+    process.env.STRIPE_WEBHOOK_LOCAL_SECRET
+  );
 
-  const data = event.data
-    .object as Stripe.Subscription;
+  const data = event.data.object as Stripe.Subscription;
 
   if (relevantEvents.has(event.type)) {
     switch (event.type) {
       case "customer.subscription.created": {
         await createSubscription({
-          stripeCustomerId:
-            data.customer as string,
+          stripeCustomerId: data.customer as string,
         });
         break;
       }
       case "customer.subscription.deleted": {
         await deleteSubscription({
-          stripeCustomerId:
-            data.customer as string,
+          stripeCustomerId: data.customer as string,
         });
         break;
       }
@@ -61,10 +49,7 @@ export async function POST(
     }
   }
 
-  return new Response(
-    JSON.stringify({ received: true }),
-    {
-      status: 200,
-    }
-  );
+  return new Response(JSON.stringify({ received: true }), {
+    status: 200,
+  });
 }

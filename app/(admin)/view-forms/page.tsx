@@ -1,20 +1,18 @@
-import React from 'react'
-import FormsList from '@/app/forms/FormsList'
-import { getUserForms } from '@/app/actions/getUserForms'
-import { InferSelectModel } from 'drizzle-orm'
+import React from "react";
+import FormsList from "@/components/forms/FormsList";
+import { getUserForms } from "@/app/actions/getUserForms";
+import { InferSelectModel } from "drizzle-orm";
 import { forms as dbForms } from "@/db/schema";
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider } from "next-auth/react";
 
-type Props = {}
-
-const page = async (props: Props) => {
+const ViewFormsPage = async () => {
   const forms: InferSelectModel<typeof dbForms>[] = await getUserForms();
 
   return (
     <SessionProvider>
       <FormsList forms={forms} />
     </SessionProvider>
-  )
-}
+  );
+};
 
-export default page
+export default ViewFormsPage;

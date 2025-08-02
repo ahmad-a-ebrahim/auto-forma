@@ -1,12 +1,11 @@
 import Header from "@/components/ui/header";
-import DashboardNav from "@/components/navigation/navbar";
+import DashboardNav from "@/components/navigation/DashboardNav";
 import { SessionProvider } from "next-auth/react";
-import FormGenerator from "../form-generator";
+import FormGenerator from "../../components/forms/form-generator";
 import { SidebarNavItem } from "@/types/nav-types";
-import UpgradeAccBtn from "@/components/navigation/upgradeAccBtn";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import UserSubscriptionWrapper from "../form-generator/UserSubscriptionWrapper";
+import UserSubscriptionWrapper from "../../components/forms/form-generator/UserSubscriptionWrapper";
 
 const dashboardConfig: {
   sidebarNav: SidebarNavItem[];
@@ -17,11 +16,6 @@ const dashboardConfig: {
       href: "/view-forms",
       icon: "library",
     },
-    // {
-    //   title: "Analytics",
-    //   href: "/analytics",
-    //   icon: "lineChart",
-    // },
     {
       title: "Settings",
       href: "/settings",

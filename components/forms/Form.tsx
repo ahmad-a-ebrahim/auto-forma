@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import FormPublishSuccess from "./FormPublishSuccess";
-import { publishForm } from "../actions/mutateForm";
-import { updateFormQuestions } from "../actions/updateFormQuestions";
+import { publishForm } from "@/app/actions/mutateForm";
+import { updateFormQuestions } from "@/app/actions/updateFormQuestions";
 import { useRouter } from "next/navigation";
 import FormField from "./FormField";
 import {
@@ -62,6 +61,8 @@ const Form: React.FC<Props> = ({
       text: "",
       fieldType: "Input",
       fieldOptions: [],
+      formId: initialForm.id,
+      required: false,
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -82,9 +83,12 @@ const Form: React.FC<Props> = ({
         description,
         questions: questions.map((q) => ({
           id: q.id,
-          text: q.text,
-          fieldType: q.fieldType,
-          fieldOptions: q.fieldOptions,
+          text: q.text ?? "",
+          fieldType: q.fieldType ?? "Input",
+          fieldOptions: q.fieldOptions.map((opt) => ({
+            text: opt.text ?? "",
+            value: opt.value ?? "",
+          })),
         })),
       });
       alert("Form changes saved!");

@@ -3,6 +3,8 @@
 import { db } from "@/db";
 import { forms, questions, fieldOptions } from "@/db/schema";
 
+type FieldType = "RadioGroup" | "Select" | "Input" | "Textarea" | "Switch";
+
 type CreatePayload = {
   userId: string;
   name: string;
@@ -10,44 +12,49 @@ type CreatePayload = {
   questions: {
     id: number;
     text: string;
-    fieldType: string;
+    fieldType: FieldType;
     fieldOptions: { text: string; value: string }[];
   }[];
 };
 
 export async function createForm(payload: CreatePayload) {
-  const { userId, name, description, questions: qs } = payload;
+  try {
+    const { userId, name, description, questions: qs } = payload;
 
-  const [newForm] = await db
-    .insert(forms)
-    .values({
-      userId, // 👈 نربطه مع اليوزر
-      name,
-      description,
-      published: false,
-    })
-    .returning({ id: forms.id });
-
-  for (const q of qs) {
-    const [newQuestion] = await db
-      .insert(questions)
+    const [newForm] = await db
+      .insert(forms)
       .values({
-        formId: newForm.id,
-        text: q.text,
-        fieldType: q.fieldType,
+        userId,
+        name,
+        description,
+        published: false,
       })
-      .returning({ id: questions.id });
+      .returning({ id: forms.id });
 
-    if (q.fieldOptions?.length) {
-      await db.insert(fieldOptions).values(
-        q.fieldOptions.map((opt) => ({
-          questionId: newQuestion.id,
-          text: opt.text,
-          value: opt.value,
-        }))
-      );
+    for (const q of qs) {
+      const [newQuestion] = await db
+        .insert(questions)
+        .values({
+          formId: newForm.id,
+          text: q.text,
+          fieldType: q.fieldType,
+        })
+        .returning({ id: questions.id });
+
+      if (q.fieldOptions?.length) {
+        await db.insert(fieldOptions).values(
+          q.fieldOptions.map((opt) => ({
+            questionId: newQuestion.id,
+            text: opt.text,
+            value: opt.value,
+          }))
+        );
+      }
     }
-  }
 
-  return { id: newForm.id };
+    return { id: newForm.id };
+  } catch (err) {
+    console.error("Error creating form:", err);
+    throw new Error("Something went wrong while creating the form.");
+  }
 }

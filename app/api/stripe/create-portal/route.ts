@@ -4,9 +4,7 @@ import { users } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
 import { eq } from "drizzle-orm";
 
-export async function POST(
-  req: Request
-) {
+export async function POST(req: Request) {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -21,10 +19,9 @@ export async function POST(
     );
   }
 
-  const user =
-    await db.query.users.findFirst({
-      where: eq(users.id, userId),
-    });
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
 
   if (!user) {
     return new Response(
@@ -52,29 +49,18 @@ export async function POST(
         dbId: userId,
       },
     };
-    const response =
-      await stripe.customers.create(
-        customerData
-      );
+    const response = await stripe.customers.create(customerData);
 
     customer = { id: response.id };
   }
-  
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    "http://localhost:3000";
-  const url =
-    await stripe.billingPortal.sessions.create(
-      {
-        customer: customer.id,
-        return_url: `${baseUrl}/settings`,
-      }
-    );
 
-  return new Response(
-    JSON.stringify({ url }),
-    {
-      status: 200,
-    }
-  );
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const url = await stripe.billingPortal.sessions.create({
+    customer: customer.id,
+    return_url: `${baseUrl}/settings`,
+  });
+
+  return new Response(JSON.stringify({ url }), {
+    status: 200,
+  });
 }

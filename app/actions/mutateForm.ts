@@ -15,53 +15,70 @@ interface SaveFormData extends Form {
 }
 
 export async function saveForm(data: SaveFormData) {
-  const { name, description, questions } = data;
-  const session = await auth();
-  const userId = session?.user?.id;
+  try {
+    const { name, description } = data;
 
-  const newForm = await db
-    .insert(forms)
-    .values({
-      name,
-      description,
-      userId,
-      published: false,
-    })
-    .returning({ insertedId: forms.id });
-  const formId = newForm[0].insertedId;
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
 
-  // add questions and options
-  const newQuestions = data.questions.map((question) => {
-    return {
+    const [newForm] = await db
+      .insert(forms)
+      .values({
+        name,
+        description,
+        userId,
+        published: false,
+      })
+      .returning({ insertedId: forms.id });
+
+    const formId = newForm.insertedId;
+
+    const newQuestions = data.questions.map((question) => ({
       text: question.text,
       fieldType: question.fieldType,
       fieldOptions: question.fieldOptions,
       formId,
-    };
-  });
+    }));
 
-  await db.transaction(async (tx) => {
-    for (const question of newQuestions) {
-      const [{ questionId }] = await tx
-        .insert(dbQuestions)
-        .values(question)
-        .returning({ questionId: dbQuestions.id });
-      if (question.fieldOptions && question.fieldOptions.length > 0) {
-        await tx.insert(fieldOptions).values(
-          question.fieldOptions.map((option) => ({
-            text: option.text,
-            value: option.value,
-            questionId,
-          }))
-        );
+    await db.transaction(async (tx) => {
+      for (const question of newQuestions) {
+        const [{ questionId }] = await tx
+          .insert(dbQuestions)
+          .values({
+            text: question.text,
+            fieldType: question.fieldType,
+            formId: question.formId,
+          })
+          .returning({ questionId: dbQuestions.id });
+
+        if (question.fieldOptions?.length) {
+          await tx.insert(fieldOptions).values(
+            question.fieldOptions.map((option) => ({
+              text: option.text,
+              value: option.value,
+              questionId,
+            }))
+          );
+        }
       }
-    }
-  });
+    });
 
-  return formId;
+    return formId;
+  } catch (err) {
+    console.error("Error saving form:", err);
+    throw new Error("Something went wrong while saving the form.");
+  }
 }
 
 export async function publishForm(formId: number) {
-  await db.update(forms).set({ published: true }).where(eq(forms.id, formId));
-  revalidatePath("/");
+  try {
+    await db.update(forms).set({ published: true }).where(eq(forms.id, formId));
+    revalidatePath("/");
+  } catch (err) {
+    console.error("Error publishing form:", err);
+    throw new Error("Something went wrong while publishing the form.");
+  }
 }

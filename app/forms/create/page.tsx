@@ -10,10 +10,9 @@ import {
   Form as FormComponent,
   FormField as ShadCnFormField,
   FormItem,
-  FormLabel,
   FormControl,
 } from "@/components/ui/form";
-import FormField from "../FormField";
+import FormField from "../../../components/forms/FormField";
 import { createForm } from "@/app/actions/createForm";
 
 import type {
@@ -26,7 +25,7 @@ interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
 }
 
-const CreateForm: React.FC = () => {
+const CreateFormPage: React.FC = () => {
   const session = useSession();
   const userId = session.data?.user?.id;
 
@@ -44,6 +43,8 @@ const CreateForm: React.FC = () => {
       text: "",
       fieldType: "Input",
       fieldOptions: [],
+      formId: null,
+      required: false,
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -55,13 +56,23 @@ const CreateForm: React.FC = () => {
   };
 
   const handleCreateForm = async () => {
+    const cleanedQuestions = questions.map((q) => ({
+      id: q.id,
+      text: q.text ?? "",
+      fieldType: q.fieldType ?? "Input",
+      fieldOptions: q.fieldOptions.map((opt) => ({
+        text: opt.text ?? "",
+        value: opt.value ?? "",
+      })),
+    }));
+
     try {
       setIsLoading(true);
       const result = await createForm({
-        userId,
+        userId: userId ?? "",
         name,
         description,
-        questions,
+        questions: cleanedQuestions,
       });
       if (result?.id) {
         router.push(`/forms/edit/${result.id}`);
@@ -170,4 +181,4 @@ const CreateForm: React.FC = () => {
   );
 };
 
-export default CreateForm;
+export default CreateFormPage;
