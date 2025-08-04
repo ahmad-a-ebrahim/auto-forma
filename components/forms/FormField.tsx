@@ -18,7 +18,7 @@ import {
   QuestionSelectModel,
   FieldOptionSelectModel,
 } from "@/types/form-types";
-import { Minus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 
 type Props = {
   element: QuestionSelectModel & { fieldOptions: FieldOptionSelectModel[] };
@@ -116,7 +116,7 @@ const FormField: React.FC<Props> = ({
             ))}
             {/* Add Option button */}
             <Button type="button" variant="outline" onClick={addOption}>
-              + Add Option
+              <Plus /> Add Option
             </Button>
           </div>
         )}
@@ -127,7 +127,11 @@ const FormField: React.FC<Props> = ({
   // Non-edit mode: render the appropriate input
   const components = {
     Input: () => (
-      <Input id={id} type="text" onChange={(e) => onChange(e.target.value)} />
+      <Input
+        id={id}
+        type="text"
+        onChange={(e) => onChange(String(e.target.value))}
+      />
     ),
     Switch: () => (
       <Switch
@@ -139,13 +143,16 @@ const FormField: React.FC<Props> = ({
       <Textarea
         id={id}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(String(e.target.value))}
       />
     ),
     Select: () => (
       <Select onValueChange={onChange}>
         <SelectTrigger>
-          <SelectValue defaultValue={value} placeholder="Select option" />
+          <SelectValue
+            defaultValue={String(value)}
+            placeholder="Select option"
+          />
         </SelectTrigger>
         <SelectContent>
           {element.fieldOptions.map((option) => (

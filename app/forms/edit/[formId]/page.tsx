@@ -4,6 +4,9 @@ import { forms } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import Form from "@/components/forms/Form";
+import MessageUI from "@/components/MessageUI";
+import notFound from "@/public/not-found.svg";
+import security from "@/public/security.svg";
 
 const EditFormPage = async ({
   params,
@@ -15,7 +18,7 @@ const EditFormPage = async ({
   const formId = params.formId;
 
   if (!formId) {
-    return <div>Form not found</div>;
+    return <MessageUI image={notFound} message="Form not found." />;
   }
 
   const session = await auth();
@@ -31,12 +34,17 @@ const EditFormPage = async ({
     },
   });
 
-  if (userId !== form?.userId) {
-    return <div>You are not authorized to view this page</div>;
+  if (!form) {
+    return <MessageUI image={notFound} message="Form not found." />;
   }
 
-  if (!form) {
-    return <div>Form not found</div>;
+  if (userId !== form?.userId) {
+    return (
+      <MessageUI
+        image={security}
+        message="You are not authorized to view this page."
+      />
+    );
   }
 
   const sanitizedForm = {

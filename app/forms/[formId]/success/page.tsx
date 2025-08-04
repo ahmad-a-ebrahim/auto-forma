@@ -1,15 +1,16 @@
 import React from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import success from "@/public/success.svg";
 
 const SubmitFormSuccessPage = () => {
   return (
-    <Alert variant="default" className="max-w-md">
-      <AlertTitle className="text-center text-lg font-[500] flex flex-col gap-2 items-center justify-center">
-        <CheckCircle2 className="text-green-600 h-8 w-8" />
+    <Alert variant="default" className="max-w-md border-none">
+      <AlertTitle className="text-center text-lg font-medium flex flex-col gap-7 items-center justify-center">
+        <Image src={success} width={176} alt="Success" />
         Success
       </AlertTitle>
-      <AlertDescription className="text-center text-base">
+      <AlertDescription className="text-center text-sm">
         Your answers were recorded successfully. Thank you for submitting the
         form!
       </AlertDescription>

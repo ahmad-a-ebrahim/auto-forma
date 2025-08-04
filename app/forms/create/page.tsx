@@ -20,6 +20,8 @@ import type {
   FieldOptionSelectModel,
 } from "@/types/form-types";
 import { useSession } from "next-auth/react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -64,6 +66,7 @@ const CreateFormPage: React.FC = () => {
         text: opt.text ?? "",
         value: opt.value ?? "",
       })),
+      required: q.required,
     }));
 
     try {
@@ -93,7 +96,7 @@ const CreateFormPage: React.FC = () => {
         size="icon"
         variant="ghost"
         className="absolute top-1 left-1 sm:top-10 sm:left-10"
-        onClick={() => router.back()}
+        onClick={() => router.push("/view-forms")}
       >
         <ArrowLeft />
       </Button>
@@ -150,6 +153,23 @@ const CreateFormPage: React.FC = () => {
                   </FormItem>
                 )}
               />
+
+              <div className="flex justify-start items-center gap-4 pt-4">
+                <Label htmlFor={`question_${question.id}`}>Required</Label>
+                <Switch
+                  id={`question_${question.id}`}
+                  checked={question.required}
+                  onCheckedChange={(checked: boolean) => {
+                    const updatedQuestions = questions.map((q) => {
+                      if (q.id === question.id)
+                        return { ...q, required: checked };
+                      return q;
+                    });
+
+                    setQuestions([...updatedQuestions]);
+                  }}
+                />
+              </div>
             </div>
           ))}
 
@@ -160,7 +180,7 @@ const CreateFormPage: React.FC = () => {
               onClick={addQuestion}
               className="max-w-fit"
             >
-              <Plus size={16} className="mr-2" /> Add Question
+              <Plus className="mr-2" /> Add Question
             </Button>
           </div>
 

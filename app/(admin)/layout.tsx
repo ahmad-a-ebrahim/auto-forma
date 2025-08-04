@@ -47,11 +47,10 @@ export default async function AdminLayout({
             <h1 className="text-2xl font-semibold">Dashboard</h1>
             <SessionProvider>
               <UserSubscriptionWrapper>
-                <FormGenerator size="sm" variant="secondary" />
+                <FormGenerator size={"sm"} variant="secondary" />
               </UserSubscriptionWrapper>
             </SessionProvider>
           </header>
-          <hr className="my-4" />
           {children}
         </main>
       </div>

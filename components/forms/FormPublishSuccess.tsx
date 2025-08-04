@@ -32,10 +32,10 @@ const FormPublishSuccess = (props: Props) => {
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Go Live</DialogTitle>
+          <DialogTitle>Your form is ready!</DialogTitle>
           <DialogDescription>
-            Your form is ready! Share the link below and start collecting
-            responses from your users right away
+            Share the link below and start collecting responses from your users
+            right away
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col">
@@ -49,7 +49,13 @@ const FormPublishSuccess = (props: Props) => {
               disabled
               value={`${baseUrl}/forms/${props.formId}`}
             />
-            <Button onClick={copyToClipboard}>Copy</Button>
+            <Button
+              onClick={copyToClipboard}
+              variant="secondary"
+              className="rounded-l-none"
+            >
+              Copy
+            </Button>
           </div>
         </div>
       </DialogContent>

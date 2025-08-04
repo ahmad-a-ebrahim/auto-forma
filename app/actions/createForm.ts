@@ -14,6 +14,7 @@ type CreatePayload = {
     text: string;
     fieldType: FieldType;
     fieldOptions: { text: string; value: string }[];
+    required?: boolean;
   }[];
 };
 
@@ -38,6 +39,7 @@ export async function createForm(payload: CreatePayload) {
           formId: newForm.id,
           text: q.text,
           fieldType: q.fieldType,
+          required: q.required,
         })
         .returning({ id: questions.id });
 

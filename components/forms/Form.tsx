@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { publishForm } from "@/app/actions/mutateForm";
 import { updateFormQuestions } from "@/app/actions/updateFormQuestions";
@@ -11,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,13 @@ import {
   QuestionSelectModel,
   FieldOptionSelectModel,
 } from "@/types/form-types";
-import { ArrowLeft, SendHorizonal, X } from "lucide-react";
+import { ArrowLeft, Plus, Send, X } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import MessageUI from "../MessageUI";
+import lightPulp from "@/public/light-pulp.svg";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -43,7 +50,6 @@ const Form: React.FC<Props> = ({
   editMode,
   previewMode,
 }) => {
-  const formHook = useForm();
   const router = useRouter();
 
   // States
@@ -53,6 +59,33 @@ const Form: React.FC<Props> = ({
     initialForm.questions
   );
   const [isLoading, setIsLoading] = useState(false);
+
+  const schema = useMemo(() => {
+    let validationObj: any = {};
+
+    questions.forEach((q) => {
+      if (q.fieldType === "Switch") {
+        validationObj[`question_${q.id}`] = z.any();
+      } else {
+        if (q.required) {
+          validationObj[`question_${q.id}`] = z
+            .string({
+              required_error: "Required",
+              message: "Required",
+            })
+            .min(1, { message: "Required" });
+        } else {
+          validationObj[`question_${q.id}`] = z.string().optional();
+        }
+      }
+    });
+
+    return z.object(validationObj);
+  }, [questions]);
+
+  const formHook = useForm({
+    resolver: zodResolver(editMode || previewMode ? z.any() : schema),
+  });
 
   // Add Question
   const addQuestion = () => {
@@ -89,6 +122,7 @@ const Form: React.FC<Props> = ({
             text: opt.text ?? "",
             value: opt.value ?? "",
           })),
+          required: q.required,
         })),
       });
       alert("Form changes saved!");
@@ -150,18 +184,25 @@ const Form: React.FC<Props> = ({
   };
 
   if (initialForm.published && editMode)
-    return <div>This form is published, you can not modify it</div>;
+    return (
+      <MessageUI
+        image={lightPulp}
+        message="This form is published, you can not modify it."
+      />
+    );
 
   return (
     <div className="text-center sm:min-w-96">
-      <Button
-        size="icon"
-        variant={"ghost"}
-        className="absolute top-1 left-1 sm:top-10 sm:left-10"
-        onClick={() => router.back()}
-      >
-        <ArrowLeft />
-      </Button>
+      {(editMode || previewMode) && (
+        <Button
+          size="icon"
+          variant={"ghost"}
+          className="absolute top-1 left-1 sm:top-10 sm:left-10"
+          onClick={() => router.push("/view-forms")}
+        >
+          <ArrowLeft />
+        </Button>
+      )}
 
       {editMode ? (
         <Input
@@ -216,13 +257,15 @@ const Form: React.FC<Props> = ({
                   <FormItem
                     className={cn(
                       question.fieldType === "Switch" &&
-                        "flex items-center gap-2"
+                        !editMode &&
+                        "flex justify-between items-center gap-2"
                     )}
                   >
                     {!editMode && (
                       <FormLabel
                         htmlFor={field.name}
                         className="text-base mt-3"
+                        required={question.required}
                       >
                         {index + 1}. {question.text}
                       </FormLabel>
@@ -244,9 +287,29 @@ const Form: React.FC<Props> = ({
                         editMode={editMode}
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {editMode && (
+                <div className="flex justify-start items-center gap-4 pt-4">
+                  <Label htmlFor={`question_${question.id}`}>Required</Label>
+                  <Switch
+                    id={`question_${question.id}`}
+                    checked={question.required}
+                    onCheckedChange={(checked: boolean) => {
+                      const updatedQuestions = questions.map((q) => {
+                        if (q.id === question.id)
+                          return { ...q, required: checked };
+                        return q;
+                      });
+
+                      setQuestions([...updatedQuestions]);
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ))}
 
@@ -258,7 +321,7 @@ const Form: React.FC<Props> = ({
                 onClick={addQuestion}
                 className="max-w-fit"
               >
-                + Add Question
+                <Plus className="mr-2" /> Add Question
               </Button>
             </div>
           )}
@@ -289,10 +352,10 @@ const Form: React.FC<Props> = ({
               variant={"default"}
               type="submit"
               size={"lg"}
-              className="fixed bottom-1 right-1 sm:bottom-10 sm:right-10 flex gap-2"
+              className="fixed bottom-1 right-1 sm:bottom-10 sm:right-10 flex gap-2.5"
             >
+              <Send />
               Publish
-              <SendHorizonal size={16} />
             </Button>
           )}
         </form>

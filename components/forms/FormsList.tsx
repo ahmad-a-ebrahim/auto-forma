@@ -17,6 +17,8 @@ import FormPublishSuccess from "./FormPublishSuccess";
 import { Copy } from "lucide-react";
 import { deleteForm } from "@/app/actions/deleteForm";
 import { useSession } from "next-auth/react";
+import MessageUI from "../MessageUI";
+import idea from "@/public/idea.svg";
 
 type Form = InferSelectModel<typeof forms>;
 
@@ -45,8 +47,18 @@ const FormsList = (props: Props) => {
     });
   };
 
+  if (!props.forms.length) {
+    return (
+      <MessageUI
+        image={idea}
+        message="No forms added yet, Create your first form!"
+        disableBtn
+      />
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-2 sm:p-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 p-2 sm:p-4 gap-4">
       {props.forms.map((form: Form) => (
         <Card key={form.id} className="flex flex-col justify-between">
           <CardHeader>
@@ -55,7 +67,7 @@ const FormsList = (props: Props) => {
           </CardHeader>
           <CardContent>
             {form.published && (
-              <div className="px-4 py-1 font-[500] bg-green-500 text-white text-sm rounded-full flex items-center gap-4 max-w-fit">
+              <div className="px-4 py-1 font-[500] bg-green-600 text-white text-xs rounded-full flex items-center gap-4 max-w-fit">
                 Published
                 <Button
                   size={"icon"}
@@ -71,14 +83,13 @@ const FormsList = (props: Props) => {
               </div>
             )}
             {!form.published && (
-              <span className="px-4 py-1 font-[500] bg-gray-500 text-white text-sm rounded-full">
+              <span className="px-4 py-1 font-[500] bg-gray-600 text-white text-xs rounded-full">
                 Draft
               </span>
             )}
           </CardContent>
-          <CardFooter className="flex flex-col gap-2">
+          <CardFooter className="flex flex-wrap justify-start gap-1">
             <Link
-              className="w-full"
               href={
                 form.published
                   ? `/forms/preview/${form.id}`
@@ -86,23 +97,25 @@ const FormsList = (props: Props) => {
               }
             >
               <Button className="w-full" size="sm">
+                {/* {form.published ? <Eye /> : <Edit />} */}
                 {form.published ? "Preview" : "Edit"}
               </Button>
             </Link>
             {form.published && (
-              <Link className="w-full" href={`/results?formId=${form.id}`}>
-                <Button variant="secondary" className="w-full" size="sm">
+              <Link href={`/results?formId=${form.id}`}>
+                <Button variant="outline" className="w-full" size="sm">
+                  {/* <BarChart /> */}
                   Results
                 </Button>
               </Link>
             )}
             <Button
-              className="w-full"
               variant="destructive"
               size={"sm"}
               onClick={() => handleDelete(form.id)}
               disabled={isPending}
             >
+              {/* <Trash /> */}
               {"Delete"}
             </Button>
           </CardFooter>

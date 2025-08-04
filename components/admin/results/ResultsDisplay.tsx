@@ -3,6 +3,9 @@ import { ResultsTable } from "./ResultsTable";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { forms } from "@/db/schema";
+import MessageUI from "@/components/MessageUI";
+import notFound from "@/public/not-found.svg";
+import noData from "@/public/no-data.svg";
 
 type Props = {
   formId: number;
@@ -30,11 +33,21 @@ const ResultsDisplay = async ({ formId }: Props) => {
   });
 
   if (!form || !form.published)
-    return <p className="w-full text-center">This form is not found</p>;
-
-  if (!form.submissions)
     return (
-      <p className="w-full text-center">No submissions on this form yet!</p>
+      <MessageUI
+        image={notFound}
+        message="This form is not found."
+        disableBtn
+      />
+    );
+
+  if (!form.submissions.length)
+    return (
+      <MessageUI
+        image={noData}
+        message="No submissions on this form yet!"
+        disableBtn
+      />
     );
 
   return (

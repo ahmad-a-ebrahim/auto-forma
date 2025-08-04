@@ -18,6 +18,7 @@ type UpdatePayload = {
       text: string;
       value: string;
     }[];
+    required?: boolean;
   }[];
 };
 
@@ -60,6 +61,7 @@ export async function updateFormQuestions(payload: UpdatePayload) {
               formId,
               text: q.text,
               fieldType: q.fieldType,
+              required: q.required,
             })
             .returning({ id: questions.id });
 
@@ -83,6 +85,7 @@ export async function updateFormQuestions(payload: UpdatePayload) {
           .set({
             text: q.text,
             fieldType: q.fieldType,
+            required: q.required,
           })
           .where(eq(questions.id, q.id));
 
