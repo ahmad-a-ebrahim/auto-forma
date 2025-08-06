@@ -1,8 +1,9 @@
 "use client";
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, Info, Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,10 @@ import {
   FormField as ShadCnFormField,
   FormItem,
   FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import FormField from "../../../components/forms/FormField";
 import { createForm } from "@/app/actions/createForm";
-
 import type {
   QuestionSelectModel,
   FieldOptionSelectModel,
@@ -22,21 +23,42 @@ import type {
 import { useSession } from "next-auth/react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formSchema } from "@/utils/validation";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
 }
 
 const CreateFormPage: React.FC = () => {
+  const router = useRouter();
   const session = useSession();
   const userId = session.data?.user?.id;
 
-  const formHook = useForm();
-  const router = useRouter();
+  const defaultValues: {
+    name: string;
+    description: string;
+    questions: QuestionWithOptions[];
+  } = {
+    name: "",
+    description: "",
+    questions: [],
+  };
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [questions, setQuestions] = useState<QuestionWithOptions[]>([]);
+  const formHook = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+  });
+  const name: string = formHook.watch("name");
+  const description: string = formHook.watch("description");
+  const questions: QuestionWithOptions[] = formHook.watch("questions");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const addQuestion = () => {
@@ -47,17 +69,19 @@ const CreateFormPage: React.FC = () => {
       fieldOptions: [],
       formId: null,
       required: false,
+      order: questions.length,
     };
-    setQuestions([...questions, newQuestion]);
+    formHook.setValue("questions", [...questions, newQuestion]);
   };
 
   const deleteQuestion = (index: number) => {
     const updated = [...questions];
     updated.splice(index, 1);
-    setQuestions(updated);
+    formHook.setValue("questions", updated);
+    formHook.trigger();
   };
 
-  const handleCreateForm = async () => {
+  const onSubmit = async (data: any) => {
     const cleanedQuestions = questions.map((q) => ({
       id: q.id,
       text: q.text ?? "",
@@ -67,6 +91,7 @@ const CreateFormPage: React.FC = () => {
         value: opt.value ?? "",
       })),
       required: q.required,
+      order: q.order,
     }));
 
     try {
@@ -78,7 +103,7 @@ const CreateFormPage: React.FC = () => {
         questions: cleanedQuestions,
       });
       if (result?.id) {
-        router.push(`/forms/edit/${result.id}`);
+        router.push(`/view-forms`);
       } else {
         alert("Creation failed!");
       }
@@ -91,7 +116,7 @@ const CreateFormPage: React.FC = () => {
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center min-w-[90dvw] sm:min-w-96">
       <Button
         size="icon"
         variant="ghost"
@@ -101,79 +126,155 @@ const CreateFormPage: React.FC = () => {
         <ArrowLeft />
       </Button>
 
-      <Input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Form Name"
-        className="text-lg font-bold py-3 bg-transparent outline-none border-b w-full mb-4"
-      />
-
-      <Textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Form Description"
-        className="text-md bg-transparent outline-none border-b w-full"
-      />
-
       <FormComponent {...formHook}>
-        <div className="my-4 flex flex-col gap-6 text-left sm:min-w-96">
-          {questions.map((question, index) => (
-            <div
-              key={question.id}
-              className="relative bg-accent p-6 rounded-md pt-12"
-            >
-              <Button
-                size="icon"
-                variant="ghost"
-                type="button"
-                onClick={() => deleteQuestion(index)}
-                className="absolute top-0 right-0 text-red-500 hover:text-red-500 hover:bg-red-100"
-              >
-                <X size={16} />
-              </Button>
+        <form
+          onSubmit={formHook.handleSubmit(onSubmit)}
+          className="my-4 text-left"
+        >
+          <ShadCnFormField
+            control={formHook.control}
+            name={`name`}
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormControl>
+                  <Input
+                    value={field.value}
+                    onChange={field.onChange}
+                    className="text-lg font-bold py-3 bg-transparent outline-none border-b w-full"
+                    placeholder="Form Name"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <ShadCnFormField
-                control={formHook.control}
-                name={`question_${question.id}`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <FormField
-                        id={`question_${question.id}`}
-                        element={question}
-                        value={field.value}
-                        onChange={(val) => {
-                          const updated = [...questions];
-                          updated[index] = val;
-                          setQuestions(updated);
-                        }}
-                        editMode={true}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+          <ShadCnFormField
+            control={formHook.control}
+            name={`description`}
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormControl>
+                  <Textarea
+                    value={field.value}
+                    onChange={field.onChange}
+                    className="text-md bg-transparent outline-none border-b w-full"
+                    placeholder="Form Description"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <div className="flex justify-start items-center gap-4 pt-4">
-                <Label htmlFor={`question_${question.id}`}>Required</Label>
-                <Switch
-                  id={`question_${question.id}`}
-                  checked={question.required}
-                  onCheckedChange={(checked: boolean) => {
-                    const updatedQuestions = questions.map((q) => {
-                      if (q.id === question.id)
-                        return { ...q, required: checked };
-                      return q;
-                    });
+          <DragDropContext
+            onDragStart={() => {
+              formHook.clearErrors();
+            }}
+            onDragEnd={(result: DropResult) => {
+              if (!result.destination) return;
 
-                    setQuestions([...updatedQuestions]);
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+              const updated = Array.from(questions);
+              const [moved] = updated.splice(result.source.index, 1);
+              updated.splice(result.destination.index, 0, moved);
 
-          <div className="bg-accent p-6 rounded-md">
+              const reordered = updated.map((q, idx) => ({
+                ...q,
+                order: idx,
+              }));
+
+              formHook.setValue("questions", reordered);
+              formHook.trigger();
+            }}
+          >
+            <Droppable droppableId="questions">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {questions.map((question, index) => (
+                    <Draggable
+                      key={question.id}
+                      draggableId={question.id.toString()}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="relative bg-accent p-6 rounded-md pt-12 mb-4"
+                        >
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            type="button"
+                            onClick={() => deleteQuestion(index)}
+                            className="absolute top-0 right-0 text-red-500 hover:text-red-500 hover:bg-red-100"
+                          >
+                            <X size={16} />
+                          </Button>
+
+                          <ShadCnFormField
+                            control={formHook.control}
+                            name={`questions.${index}`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <FormField
+                                    id={field.name}
+                                    element={question}
+                                    value={String(index)}
+                                    onChange={(val) => {
+                                      const updated = [...questions];
+                                      updated[index] = val;
+                                      formHook.setValue("questions", updated);
+                                    }}
+                                    editMode={true}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="flex justify-start items-center gap-4 pt-4">
+                            <Label htmlFor={`question_${question.id}`}>
+                              Required
+                            </Label>
+                            <Switch
+                              id={`question_${question.id}`}
+                              checked={question.required}
+                              onCheckedChange={(checked: boolean) => {
+                                const updatedQuestions = questions.map((q) => {
+                                  if (q.id === question.id)
+                                    return { ...q, required: checked };
+                                  return q;
+                                });
+
+                                formHook.setValue("questions", [
+                                  ...updatedQuestions,
+                                ]);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+
+          {(formHook.formState.errors.questions?.message ||
+            formHook.formState.errors.questions?.root?.message) && (
+            <p className="flex items-center gap-2 text-sm font-medium text-destructive mb-4">
+              <Info size={16} />
+              {formHook.formState.errors.questions?.message ||
+                formHook.formState.errors.questions?.root?.message}
+            </p>
+          )}
+
+          <div className="bg-accent p-6 rounded-md mb-4">
             <Button
               type="button"
               variant="outline"
@@ -184,18 +285,15 @@ const CreateFormPage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="bg-accent p-6 rounded-md">
-            <Button
-              disabled={isLoading}
-              type="button"
-              variant="outline"
-              onClick={handleCreateForm}
-              className="w-full"
-            >
-              Save
-            </Button>
-          </div>
-        </div>
+          <Button
+            disabled={isLoading}
+            type="submit"
+            variant="default"
+            className="w-full"
+          >
+            Create
+          </Button>
+        </form>
       </FormComponent>
     </div>
   );

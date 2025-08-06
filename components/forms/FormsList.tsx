@@ -14,11 +14,12 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import FormPublishSuccess from "./FormPublishSuccess";
-import { Copy } from "lucide-react";
+import { BarChart, Copy, Edit, Globe, Trash } from "lucide-react";
 import { deleteForm } from "@/app/actions/deleteForm";
 import { useSession } from "next-auth/react";
 import MessageUI from "../MessageUI";
 import idea from "@/public/idea.svg";
+import { publishForm } from "@/app/actions/mutateForm";
 
 type Form = InferSelectModel<typeof forms>;
 
@@ -47,6 +48,12 @@ const FormsList = (props: Props) => {
     });
   };
 
+  const handlePublish = async (form_id: number) => {
+    startTransition(async () => {
+      await publishForm(form_id);
+    });
+  };
+
   if (!props.forms.length) {
     return (
       <MessageUI
@@ -65,9 +72,9 @@ const FormsList = (props: Props) => {
             <CardTitle>{form.name}</CardTitle>
             <CardDescription>{form.description}</CardDescription>
           </CardHeader>
-          <CardContent>
-            {form.published && (
-              <div className="px-4 py-1 font-[500] bg-green-600 text-white text-xs rounded-full flex items-center gap-4 max-w-fit">
+          <CardContent className="flex items-center justify-between gap-1">
+            {form.published ? (
+              <div className="px-4 py-1 font-[500] bg-green-700 text-white text-xs rounded-full flex items-center gap-4 max-w-fit">
                 Published
                 <Button
                   size={"icon"}
@@ -78,45 +85,69 @@ const FormsList = (props: Props) => {
                   }}
                   className="hover:bg-transparent hover:text-white w-fit h-fit border-l border-white rounded-none pl-2"
                 >
-                  <Copy size={16} />
+                  <Copy />
                 </Button>
               </div>
-            )}
-            {!form.published && (
-              <span className="px-4 py-1 font-[500] bg-gray-600 text-white text-xs rounded-full">
+            ) : (
+              <div className="px-4 py-1 font-[500] bg-secondary text-secondary-foreground text-xs rounded-full w-fit">
                 Draft
-              </span>
+              </div>
             )}
-          </CardContent>
-          <CardFooter className="flex flex-wrap justify-start gap-1">
-            <Link
-              href={
-                form.published
-                  ? `/forms/preview/${form.id}`
-                  : `/forms/edit/${form.id}`
-              }
-            >
-              <Button className="w-full" size="sm">
-                {/* {form.published ? <Eye /> : <Edit />} */}
-                {form.published ? "Preview" : "Edit"}
+            <Link href={`/forms/preview/${form.id}`}>
+              <Button
+                variant="link"
+                className="w-full px-0"
+                size="sm"
+                disabled={isPending}
+              >
+                Preview
               </Button>
             </Link>
-            {form.published && (
+          </CardContent>
+          <CardFooter className="flex flex-wrap justify-start gap-1">
+            {form.published ? (
               <Link href={`/results?formId=${form.id}`}>
-                <Button variant="outline" className="w-full" size="sm">
-                  {/* <BarChart /> */}
+                <Button
+                  variant="default"
+                  className="w-full"
+                  size="sm"
+                  disabled={isPending}
+                >
+                  <BarChart />
                   Results
                 </Button>
               </Link>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => handlePublish(form.id)}
+                  disabled={isPending}
+                >
+                  <Globe />
+                  Publish
+                </Button>
+                <Link href={`/forms/edit/${form.id}`}>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    size="sm"
+                    disabled={isPending}
+                  >
+                    <Edit />
+                    Edit
+                  </Button>
+                </Link>
+              </>
             )}
             <Button
               variant="destructive"
-              size={"sm"}
+              size="sm"
               onClick={() => handleDelete(form.id)}
               disabled={isPending}
             >
-              {/* <Trash /> */}
-              {"Delete"}
+              <Trash />
+              Delete
             </Button>
           </CardFooter>
         </Card>

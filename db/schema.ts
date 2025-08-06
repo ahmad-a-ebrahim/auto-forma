@@ -104,6 +104,7 @@ export const questions = pgTable("questions", {
   fieldType: formElements("field_type"),
   formId: integer("form_id"),
   required: boolean("required").default(false).notNull(),
+  order: integer("order").notNull(),
 });
 
 export const questionsRelations =

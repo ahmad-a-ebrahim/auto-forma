@@ -1,10 +1,10 @@
 import React from "react";
 import { db } from "@/db";
-import { forms } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import Form from "@/components/forms/Form";
+import { forms, questions } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
 import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
+import SubmitForm from "@/components/forms/SubmitForm";
 
 const SubmitFormPage = async ({
   params,
@@ -26,6 +26,7 @@ const SubmitFormPage = async ({
         with: {
           fieldOptions: true,
         },
+        orderBy: asc(questions.order),
       },
     },
   });
@@ -52,7 +53,7 @@ const SubmitFormPage = async ({
     })),
   };
 
-  return <Form form={sanitizedForm} />;
+  return <SubmitForm form={sanitizedForm} />;
 };
 
 export default SubmitFormPage;

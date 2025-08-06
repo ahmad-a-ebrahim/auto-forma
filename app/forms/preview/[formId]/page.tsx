@@ -1,12 +1,12 @@
 import React from "react";
 import { db } from "@/db";
-import { forms } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import Form from "@/components/forms/Form";
+import { forms, questions } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
 import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
 import security from "@/public/security.svg";
 import { auth } from "@/auth";
+import SubmitForm from "@/components/forms/SubmitForm";
 
 const PreviewFormPage = async ({
   params,
@@ -30,11 +30,12 @@ const PreviewFormPage = async ({
         with: {
           fieldOptions: true,
         },
+        orderBy: asc(questions.order),
       },
     },
   });
 
-  if (!form || !form.published) {
+  if (!form) {
     return <MessageUI image={notFound} message="Form not found." />;
   }
 
@@ -64,7 +65,7 @@ const PreviewFormPage = async ({
     })),
   };
 
-  return <Form form={sanitizedForm} previewMode={true} />;
+  return <SubmitForm form={sanitizedForm} previewMode={true} />;
 };
 
 export default PreviewFormPage;

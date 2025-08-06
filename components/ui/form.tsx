@@ -12,6 +12,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+import { Info } from "lucide-react"
 
 const Form = FormProvider
 
@@ -158,9 +159,10 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-destructive", className)}
+      className={cn("flex items-center gap-2 text-sm font-medium text-destructive", className)}
       {...props}
     >
+      <Info size={16} />
       {body}
     </p>
   )

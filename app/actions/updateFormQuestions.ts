@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { forms, questions, fieldOptions } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 type FieldType = "RadioGroup" | "Select" | "Input" | "Textarea" | "Switch";
 
@@ -19,6 +20,7 @@ type UpdatePayload = {
       value: string;
     }[];
     required?: boolean;
+    order: number;
   }[];
 };
 
@@ -62,6 +64,7 @@ export async function updateFormQuestions(payload: UpdatePayload) {
               text: q.text,
               fieldType: q.fieldType,
               required: q.required,
+              order: q.order,
             })
             .returning({ id: questions.id });
 
@@ -86,6 +89,7 @@ export async function updateFormQuestions(payload: UpdatePayload) {
             text: q.text,
             fieldType: q.fieldType,
             required: q.required,
+            order: q.order,
           })
           .where(eq(questions.id, q.id));
 
@@ -103,6 +107,7 @@ export async function updateFormQuestions(payload: UpdatePayload) {
       }
     });
 
+    revalidatePath("/");
     return { success: true };
   } catch (err) {
     console.error("Error updating form questions:", err);

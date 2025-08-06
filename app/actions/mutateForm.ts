@@ -36,11 +36,12 @@ export async function saveForm(data: SaveFormData) {
 
     const formId = newForm.insertedId;
 
-    const newQuestions = data.questions.map((question) => ({
+    const newQuestions = data.questions.map((question, index) => ({
       text: question.text,
       fieldType: question.fieldType,
       fieldOptions: question.fieldOptions,
       formId,
+      order: index,
     }));
 
     await db.transaction(async (tx) => {
@@ -51,6 +52,7 @@ export async function saveForm(data: SaveFormData) {
             text: question.text,
             fieldType: question.fieldType,
             formId: question.formId,
+            order: question.order,
           })
           .returning({ questionId: dbQuestions.id });
 

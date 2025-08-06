@@ -2,6 +2,7 @@
 
 import { db } from "@/db";
 import { forms, questions, fieldOptions } from "@/db/schema";
+import { revalidatePath } from "next/cache";
 
 type FieldType = "RadioGroup" | "Select" | "Input" | "Textarea" | "Switch";
 
@@ -15,6 +16,7 @@ type CreatePayload = {
     fieldType: FieldType;
     fieldOptions: { text: string; value: string }[];
     required?: boolean;
+    order: number;
   }[];
 };
 
@@ -40,6 +42,7 @@ export async function createForm(payload: CreatePayload) {
           text: q.text,
           fieldType: q.fieldType,
           required: q.required,
+          order: q.order,
         })
         .returning({ id: questions.id });
 
@@ -54,6 +57,7 @@ export async function createForm(payload: CreatePayload) {
       }
     }
 
+    revalidatePath("/");
     return { id: newForm.id };
   } catch (err) {
     console.error("Error creating form:", err);

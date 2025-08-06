@@ -1,8 +1,8 @@
 import React from "react";
 import { ResultsTable } from "./ResultsTable";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
-import { forms } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
+import { forms, questions } from "@/db/schema";
 import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
 import noData from "@/public/no-data.svg";
@@ -19,6 +19,7 @@ const ResultsDisplay = async ({ formId }: Props) => {
         with: {
           fieldOptions: true,
         },
+        orderBy: asc(questions.order),
       },
       submissions: {
         with: {

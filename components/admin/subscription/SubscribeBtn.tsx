@@ -3,6 +3,7 @@
 import { getStripe } from "@/lib/stripe-client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   userId?: string;
@@ -35,12 +36,13 @@ const SubscribeBtn = ({ userId, price }: Props) => {
   };
 
   return (
-    <button
-      className="underline text-primary"
+    <Button
+      variant="link"
+      className="p-0"
       onClick={() => handleCheckout(price)}
     >
       Upgrade your plan
-    </button>
+    </Button>
   );
 };
 

@@ -8,6 +8,13 @@
       "when": 1754049989494,
       "tag": "0000_boring_tomorrow_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1754323829918,
+      "tag": "0001_mighty_rattler",
+      "breakpoints": true
     }
   ]
 }

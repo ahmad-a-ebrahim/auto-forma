@@ -1,12 +1,12 @@
 import React from "react";
 import { db } from "@/db";
-import { forms } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { forms, questions } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
-import Form from "@/components/forms/Form";
 import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
 import security from "@/public/security.svg";
+import EditForm from "@/components/forms/EditForm";
 
 const EditFormPage = async ({
   params,
@@ -30,6 +30,7 @@ const EditFormPage = async ({
         with: {
           fieldOptions: true,
         },
+        orderBy: asc(questions.order),
       },
     },
   });
@@ -64,7 +65,7 @@ const EditFormPage = async ({
     })),
   };
 
-  return <Form form={sanitizedForm} editMode={true} />;
+  return <EditForm form={sanitizedForm} />;
 };
 
 export default EditFormPage;

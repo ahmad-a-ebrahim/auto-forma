@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   Dialog,
@@ -49,13 +50,7 @@ const FormPublishSuccess = (props: Props) => {
               disabled
               value={`${baseUrl}/forms/${props.formId}`}
             />
-            <Button
-              onClick={copyToClipboard}
-              variant="secondary"
-              className="rounded-l-none"
-            >
-              Copy
-            </Button>
+            <Button onClick={copyToClipboard}>Copy</Button>
           </div>
         </div>
       </DialogContent>

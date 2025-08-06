@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +12,12 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FormControl } from "@/components/ui/form";
+import {
+  FormField as ShadCnFormField,
+  FormControl,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +25,7 @@ import {
   FieldOptionSelectModel,
 } from "@/types/form-types";
 import { Minus, Plus } from "lucide-react";
+import { useFormContext } from "react-hook-form";
 
 type Props = {
   element: QuestionSelectModel & { fieldOptions: FieldOptionSelectModel[] };
@@ -35,6 +42,8 @@ const FormField: React.FC<Props> = ({
   id,
   editMode,
 }) => {
+  const formHook = useFormContext();
+
   if (!element) return null;
 
   if (editMode) {
@@ -61,46 +70,103 @@ const FormField: React.FC<Props> = ({
       opts.splice(idx, 1);
       onChange({ ...element, fieldOptions: opts });
     };
-
+    // value here is question index (Edit Mode)
     return (
       <div className="space-y-2">
-        <Input
-          value={element.text as string}
-          onChange={(e) => onChange({ ...element, text: e.target.value })}
-          placeholder="Question text"
+        <ShadCnFormField
+          control={formHook.control}
+          name={`questions.${value}.text`}
+          render={() => (
+            <FormItem className="mb-4">
+              <FormControl>
+                <Input
+                  value={element.text as string}
+                  onChange={(e) =>
+                    onChange({ ...element, text: e.target.value })
+                  }
+                  placeholder="Question text"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <Select
-          value={element.fieldType as string}
-          onValueChange={(val) => onChange({ ...element, fieldType: val })}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {["Input", "Textarea", "Switch", "Select", "RadioGroup"].map(
-              (type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              )
-            )}
-          </SelectContent>
-        </Select>
+
+        <ShadCnFormField
+          control={formHook.control}
+          name={`questions.${value}.fieldType`}
+          render={() => (
+            <FormItem className="mb-4">
+              <FormControl>
+                <Select
+                  value={element.fieldType as string}
+                  onValueChange={(val) =>
+                    onChange({ ...element, fieldType: val })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      "Input",
+                      "Textarea",
+                      "Switch",
+                      "Select",
+                      "RadioGroup",
+                    ].map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {(element.fieldType === "Select" ||
           element.fieldType === "RadioGroup") && (
           <div className="space-y-2">
             {element.fieldOptions.map((opt, idx) => (
-              <div key={idx} className="flex gap-2 items-center">
-                <Input
-                  value={opt.text as string}
-                  onChange={(e) => updateOption(idx, "text", e.target.value)}
-                  placeholder="Option Text"
+              <div key={idx} className="flex gap-2 items-start">
+                <ShadCnFormField
+                  control={formHook.control}
+                  name={`questions.${value}.fieldOptions.${idx}.text`}
+                  render={() => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          value={opt.text as string}
+                          onChange={(e) =>
+                            updateOption(idx, "text", e.target.value)
+                          }
+                          placeholder="Option Text"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <Input
-                  value={opt.value as string}
-                  onChange={(e) => updateOption(idx, "value", e.target.value)}
-                  placeholder="Option Value"
+                <ShadCnFormField
+                  control={formHook.control}
+                  name={`questions.${value}.fieldOptions.${idx}.value`}
+                  render={() => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          value={opt.value as string}
+                          onChange={(e) =>
+                            updateOption(idx, "value", e.target.value)
+                          }
+                          placeholder="Option Value"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
                 {/* Delete Option button */}
                 <Button
@@ -170,12 +236,10 @@ const FormField: React.FC<Props> = ({
             <FormControl>
               <RadioGroupItem
                 value={`answerId_${option.id}`}
-                id={option.value || `answerId_${option.id}`}
+                id={`answerId_${option.id}`}
               />
             </FormControl>
-            <Label htmlFor={option.value || `answerId_${option.id}`}>
-              {option.text}
-            </Label>
+            <Label htmlFor={`answerId_${option.id}`}>{option.text}</Label>
           </div>
         ))}
       </RadioGroup>
