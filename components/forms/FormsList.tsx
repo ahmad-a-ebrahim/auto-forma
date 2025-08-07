@@ -20,6 +20,16 @@ import { useSession } from "next-auth/react";
 import MessageUI from "../MessageUI";
 import idea from "@/public/idea.svg";
 import { publishForm } from "@/app/actions/mutateForm";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Form = InferSelectModel<typeof forms>;
 
@@ -28,7 +38,9 @@ type Props = {
 };
 
 const FormsList = (props: Props) => {
+  const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [formId, setFormId] = useState<number>();
   const [isPending, startTransition] = useTransition();
 
@@ -38,19 +50,57 @@ const FormsList = (props: Props) => {
   const handleDelete = (form_id: number) => {
     if (!userId) return;
 
-    const confirmDelete = confirm(
-      "Are you sure you want to delete this form and all its data?"
-    );
-    if (!confirmDelete) return;
-
     startTransition(async () => {
-      await deleteForm({ formId: form_id, userId });
+      try {
+        const res = await deleteForm({ formId: form_id, userId });
+        if (res.success) {
+          toast({
+            variant: "success",
+            title: "Success",
+            description: "Form deleted",
+          });
+          setDeleteOpen(false);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: res?.error || "Deleting failed",
+          });
+        }
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Deleting failed",
+        });
+      }
     });
   };
 
   const handlePublish = async (form_id: number) => {
     startTransition(async () => {
-      await publishForm(form_id);
+      try {
+        const res = await publishForm(form_id);
+        if (res.success) {
+          toast({
+            variant: "success",
+            title: "Success",
+            description: "Form published",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: res?.error || "Publishing failed",
+          });
+        }
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Publishing failed",
+        });
+      }
     });
   };
 
@@ -58,7 +108,7 @@ const FormsList = (props: Props) => {
     return (
       <MessageUI
         image={idea}
-        message="No forms added yet, Create your first form!"
+        message="No forms added yet, Let's create your first form"
         disableBtn
       />
     );
@@ -143,7 +193,10 @@ const FormsList = (props: Props) => {
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => handleDelete(form.id)}
+              onClick={() => {
+                setFormId(form.id);
+                setDeleteOpen(true);
+              }}
               disabled={isPending}
             >
               <Trash />
@@ -152,11 +205,36 @@ const FormsList = (props: Props) => {
           </CardFooter>
         </Card>
       ))}
+
       <FormPublishSuccess
         formId={formId}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete form</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this form and all its data?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!formId) return;
+                handleDelete(formId);
+              }}
+              disabled={isPending}
+            >
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

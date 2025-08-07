@@ -37,7 +37,7 @@ const ResultsDisplay = async ({ formId }: Props) => {
     return (
       <MessageUI
         image={notFound}
-        message="This form is not found."
+        message="This form is not found"
         disableBtn
       />
     );
@@ -46,7 +46,7 @@ const ResultsDisplay = async ({ formId }: Props) => {
     return (
       <MessageUI
         image={noData}
-        message="No submissions on this form yet!"
+        message="No submissions on this form yet"
         disableBtn
       />
     );

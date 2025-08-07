@@ -3,8 +3,10 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const ManageSubscription = () => {
+  const { toast } = useToast();
   const router = useRouter();
 
   const redirectToCustomerPortal = async () => {
@@ -19,7 +21,11 @@ const ManageSubscription = () => {
       const { url } = await response.json();
       router.push(url.url);
     } catch (error) {
-      console.error("Error redirecting to customer portal", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Redirecting to customer portal failed",
+      });
     }
   };
 

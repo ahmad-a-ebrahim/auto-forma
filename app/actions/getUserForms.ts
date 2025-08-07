@@ -20,7 +20,7 @@ export async function getUserForms() {
 
     return userForms;
   } catch (err) {
-    console.error("Error fetching user forms:", err);
+    console.error(err);
     return [];
   }
 }

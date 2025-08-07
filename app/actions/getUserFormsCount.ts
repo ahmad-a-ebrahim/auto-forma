@@ -12,7 +12,7 @@ export async function getUserFormsCount(userId: string) {
 
     return userForms.length;
   } catch (err) {
-    console.error("Error fetching user forms count:", err);
+    console.error(err);
     return 0;
   }
 }

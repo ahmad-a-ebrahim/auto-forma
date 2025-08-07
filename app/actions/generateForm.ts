@@ -4,12 +4,13 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { GoogleGenAI } from "@google/genai";
 import { saveForm } from "./mutateForm";
+import { auth } from "@/auth";
 
 function extractJSON(text: string): string {
   const jsonPattern = /{[^]*}/;
   const match = text.match(jsonPattern);
 
-  return match ? match[0].trim() : '';
+  return match ? match[0].trim() : "";
 }
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -44,6 +45,9 @@ export async function generateForm(
     "Based on the description, generate a survey object with 3 fields: name(string) for the form, description(string) of the form and a questions array where every element has 2 fields: text and the fieldType and fieldType can be of these options RadioGroup, Select, Input, Textarea, Switch; and return it in json format. For RadioGroup, and Select types also return fieldOptions array with text and value fields. For example, for RadioGroup, and Select types, the field options array can be [{text: 'Yes', value: 'yes'}, {text: 'No', value: 'no'}] and for Input, Textarea, and Switch types, the field options array can be empty. For example, for Input, Textarea, and Switch types, the field options array can be []";
 
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
       contents: `${data.description} ${promptExplanation}`,
@@ -53,20 +57,27 @@ export async function generateForm(
 
     const responseObj = JSON.parse(responseJSON);
 
-    const dbFormId = await saveForm({
+    const res = await saveForm({
+      userId,
       name: responseObj.name,
       description: responseObj.description,
       questions: responseObj.questions,
     });
 
-    revalidatePath("/");
-    return {
-      message: "success",
-      data: { formId: dbFormId },
-    };
-  } catch (error) {
-    console.log(error);
-    
+    if (res.success) {
+      revalidatePath("/");
+      return {
+        message: "success",
+        data: { formId: res.formId },
+      };
+    } else {
+      return {
+        message: res?.error || "Failed to save form",
+      };
+    }
+  } catch (err) {
+    console.error(err);
+
     return {
       message: "Failed to create form",
     };

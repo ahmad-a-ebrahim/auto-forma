@@ -31,12 +31,14 @@ import {
 } from "@hello-pangea/dnd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formSchema } from "@/utils/validation";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
 }
 
 const CreateFormPage: React.FC = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const session = useSession();
   const userId = session.data?.user?.id;
@@ -96,20 +98,34 @@ const CreateFormPage: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const result = await createForm({
+
+      const res = await createForm({
         userId: userId ?? "",
         name,
         description,
         questions: cleanedQuestions,
       });
-      if (result?.id) {
-        router.push(`/view-forms`);
+
+      if (res.success) {
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Form created",
+        });
+        router.push("/view-forms");
       } else {
-        alert("Creation failed!");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: res?.error || "Form creation failed",
+        });
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error creating form");
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err?.message || "An unexpected error occurred",
+      });
     } finally {
       setIsLoading(false);
     }

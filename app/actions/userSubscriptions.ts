@@ -17,7 +17,7 @@ export async function createSubscription({
       })
       .where(eq(users.stripeCustomerId, stripeCustomerId));
   } catch (err) {
-    console.error("Error creating subscription:", err);
+    console.error(err);
     throw new Error("Failed to create subscription.");
   }
 }
@@ -35,7 +35,7 @@ export async function deleteSubscription({
       })
       .where(eq(users.stripeCustomerId, stripeCustomerId));
   } catch (err) {
-    console.error("Error deleting subscription:", err);
+    console.error(err);
     throw new Error("Failed to delete subscription.");
   }
 }
@@ -48,7 +48,7 @@ export async function getUserSubscription({ userId }: { userId: string }) {
 
     return user?.subscribed ?? false;
   } catch (err) {
-    console.error("Error fetching user subscription:", err);
+    console.error(err);
     return false;
   }
 }

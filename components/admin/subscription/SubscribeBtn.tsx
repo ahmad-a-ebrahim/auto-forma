@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe-client";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   userId?: string;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 const SubscribeBtn = ({ userId, price }: Props) => {
+  const { toast } = useToast();
   const router = useRouter();
 
   const handleCheckout = async (price: string) => {
@@ -31,7 +33,11 @@ const SubscribeBtn = ({ userId, price }: Props) => {
 
       stripe?.redirectToCheckout({ sessionId });
     } catch (error) {
-      console.error("Error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Redirecting to checkout failed",
+      });
     }
   };
 

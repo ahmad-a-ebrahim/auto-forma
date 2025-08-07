@@ -18,7 +18,7 @@ const PreviewFormPage = async ({
   const formId = params.formId;
 
   if (!formId) {
-    return <MessageUI image={notFound} message="Form not found." />;
+    return <MessageUI image={notFound} message="Form not found" />;
   }
 
   const session = await auth();
@@ -36,14 +36,14 @@ const PreviewFormPage = async ({
   });
 
   if (!form) {
-    return <MessageUI image={notFound} message="Form not found." />;
+    return <MessageUI image={notFound} message="Form not found" />;
   }
 
   if (userId !== form?.userId) {
     return (
       <MessageUI
         image={security}
-        message="You are not authorized to view this page."
+        message="You are not authorized to view this page"
       />
     );
   }

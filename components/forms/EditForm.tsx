@@ -33,6 +33,8 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { formSchema } from "@/utils/validation";
+import { useToast } from "@/hooks/use-toast";
+import { useSession } from "next-auth/react";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -49,7 +51,11 @@ type Props = {
 };
 
 const EditForm: React.FC<Props> = ({ form: initialForm }) => {
+  const { toast } = useToast();
   const router = useRouter();
+
+  const session = useSession();
+  const userId = session.data?.user?.id;
 
   const defaultValues = useMemo(
     (): {
@@ -99,7 +105,8 @@ const EditForm: React.FC<Props> = ({ form: initialForm }) => {
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true);
-      await updateFormQuestions({
+      const res = await updateFormQuestions({
+        userId,
         formId: initialForm.id,
         name,
         description,
@@ -115,10 +122,26 @@ const EditForm: React.FC<Props> = ({ form: initialForm }) => {
           order: q.order,
         })),
       });
-      alert("Form changes saved!");
+
+      if (res.success) {
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Form saved",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: res?.error || "Saving failed",
+        });
+      }
     } catch (err) {
-      console.error(err);
-      alert("Saving failed!");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Saving failed",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +151,7 @@ const EditForm: React.FC<Props> = ({ form: initialForm }) => {
     return (
       <MessageUI
         image={lightPulp}
-        message="This form is published, you can not modify it."
+        message="This form is published, you can not modify it"
       />
     );
   }

@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 
-export async function navigate(id: number) {
+export async function navigate(id?: number) {
+  if (!id) return;
+
   redirect(`/forms/edit/${id}`);
 }

@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         }
       );
     }
-  } catch (error) {
-    console.error("Error creating checkout session", error);
+  } catch (err) {
+    console.error(err);
   }
 }

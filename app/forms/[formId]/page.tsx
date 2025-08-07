@@ -16,7 +16,7 @@ const SubmitFormPage = async ({
   const formId = params.formId;
 
   if (!formId) {
-    return <MessageUI image={notFound} message="Form not found." />;
+    return <MessageUI image={notFound} message="Form not found" />;
   }
 
   const form = await db.query.forms.findFirst({
@@ -32,7 +32,7 @@ const SubmitFormPage = async ({
   });
 
   if (!form || !form.published) {
-    return <MessageUI image={notFound} message="Form not found." />;
+    return <MessageUI image={notFound} message="Form not found" />;
   }
 
   const sanitizedForm = {

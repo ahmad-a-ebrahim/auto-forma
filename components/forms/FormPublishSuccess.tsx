@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Link2Icon } from "@radix-ui/react-icons";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   formId?: number;
@@ -18,6 +19,7 @@ type Props = {
 };
 
 const FormPublishSuccess = (props: Props) => {
+  const { toast } = useToast();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   const copyToClipboard = () => {
@@ -25,8 +27,20 @@ const FormPublishSuccess = (props: Props) => {
 
     navigator.clipboard
       .writeText(baseUrl + "/forms/" + props.formId)
-      .then(() => alert("Copied to clipboard"))
-      .catch((error) => alert("Failed to copy to clipboard"));
+      .then(() => {
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Link copied",
+        });
+      })
+      .catch(() => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Copying failed",
+        });
+      });
   };
 
   return (

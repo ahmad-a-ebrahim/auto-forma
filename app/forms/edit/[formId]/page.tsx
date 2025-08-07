@@ -7,6 +7,7 @@ import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
 import security from "@/public/security.svg";
 import EditForm from "@/components/forms/EditForm";
+import { SessionProvider } from "next-auth/react";
 
 const EditFormPage = async ({
   params,
@@ -18,7 +19,7 @@ const EditFormPage = async ({
   const formId = params.formId;
 
   if (!formId) {
-    return <MessageUI image={notFound} message="Form not found." />;
+    return <MessageUI image={notFound} message="Form not found" />;
   }
 
   const session = await auth();
@@ -36,14 +37,14 @@ const EditFormPage = async ({
   });
 
   if (!form) {
-    return <MessageUI image={notFound} message="Form not found." />;
+    return <MessageUI image={notFound} message="Form not found" />;
   }
 
   if (userId !== form?.userId) {
     return (
       <MessageUI
         image={security}
-        message="You are not authorized to view this page."
+        message="You are not authorized to view this page"
       />
     );
   }
@@ -65,7 +66,11 @@ const EditFormPage = async ({
     })),
   };
 
-  return <EditForm form={sanitizedForm} />;
+  return (
+    <SessionProvider>
+      <EditForm form={sanitizedForm} />
+    </SessionProvider>
+  );
 };
 
 export default EditFormPage;

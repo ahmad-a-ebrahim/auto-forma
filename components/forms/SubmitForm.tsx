@@ -21,6 +21,8 @@ import {
 import { ArrowLeft } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { useToast } from "@/hooks/use-toast";
+import { submitForm } from "@/app/actions/submitForm";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -38,6 +40,7 @@ type Props = {
 };
 
 const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
+  const { toast } = useToast();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +75,11 @@ const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
 
   const onSubmit = async (data: any) => {
     if (previewMode) {
-      alert("Submitted! (Preview Mode)");
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "On Preview Mode",
+      });
       return;
     }
 
@@ -93,19 +100,26 @@ const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
         answers.push({ questionId: id, fieldOptionsId, value: textValue });
       }
 
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-      const response = await fetch(`${baseUrl}/api/form/new`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formId: form.id, answers }),
+      const res = await submitForm({
+        formId: form.id,
+        answers,
       });
 
-      if (response.status === 200) {
+      if (res.success) {
         router.push(`/forms/${form.id}/success`);
       } else {
-        alert("Error submitting form. Please try again later");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: res?.error || "Submit failed",
+        });
       }
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err?.message || "An unexpected error occurred",
+      });
     } finally {
       setIsLoading(false);
     }

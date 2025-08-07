@@ -17,6 +17,7 @@ import { navigate } from "../../../app/actions/navigateToForm";
 import { PlusCircle } from "lucide-react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   size?: "sm" | "lg" | "default" | "icon" | null;
@@ -47,16 +48,30 @@ export function SubmitButton() {
 }
 
 const FormGenerator = (props: Props) => {
+  const { toast } = useToast();
   const [state, formAction] = useFormState(generateForm, initialState);
   const [open, setOpen] = useState(false);
   const session = useSession();
 
   useEffect(() => {
     if (state.message === "success") {
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Form created",
+      });
       setOpen(false);
-      navigate(state.data.formId);
+      navigate(state?.data?.formId);
+    } else {
+      if (state.message) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: state.message as string,
+        });
+      }
     }
-  }, [state.message]);
+  }, [state, toast]);
 
   const onFormCreate = () => {
     if (session.data?.user) {

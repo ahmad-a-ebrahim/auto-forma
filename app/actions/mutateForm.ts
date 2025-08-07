@@ -1,10 +1,9 @@
 "use server";
 
-import { db } from "@/db";
 import { forms, questions as dbQuestions, fieldOptions } from "@/db/schema";
-import { auth } from "@/auth";
-import { InferInsertModel, eq } from "drizzle-orm";
+import { InferInsertModel } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { baseUrl } from "@/utils/constants";
 
 type Form = InferInsertModel<typeof forms>;
 type Question = InferInsertModel<typeof dbQuestions>;
@@ -15,72 +14,29 @@ interface SaveFormData extends Form {
 }
 
 export async function saveForm(data: SaveFormData) {
-  try {
-    const { name, description } = data;
+  const res = await fetch(`${baseUrl}/api/forms/save`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-    const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      throw new Error("Unauthorized");
-    }
-
-    const [newForm] = await db
-      .insert(forms)
-      .values({
-        name,
-        description,
-        userId,
-        published: false,
-      })
-      .returning({ insertedId: forms.id });
-
-    const formId = newForm.insertedId;
-
-    const newQuestions = data.questions.map((question, index) => ({
-      text: question.text,
-      fieldType: question.fieldType,
-      fieldOptions: question.fieldOptions,
-      formId,
-      order: index,
-    }));
-
-    await db.transaction(async (tx) => {
-      for (const question of newQuestions) {
-        const [{ questionId }] = await tx
-          .insert(dbQuestions)
-          .values({
-            text: question.text,
-            fieldType: question.fieldType,
-            formId: question.formId,
-            order: question.order,
-          })
-          .returning({ questionId: dbQuestions.id });
-
-        if (question.fieldOptions?.length) {
-          await tx.insert(fieldOptions).values(
-            question.fieldOptions.map((option) => ({
-              text: option.text,
-              value: option.value,
-              questionId,
-            }))
-          );
-        }
-      }
-    });
-
-    return formId;
-  } catch (err) {
-    console.error("Error saving form:", err);
-    throw new Error("Something went wrong while saving the form.");
-  }
+  return res.json();
 }
 
 export async function publishForm(formId: number) {
-  try {
-    await db.update(forms).set({ published: true }).where(eq(forms.id, formId));
+  const res = await fetch(`${baseUrl}/api/forms/publish`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ formId }),
+  });
+
+  if (res.ok) {
     revalidatePath("/");
-  } catch (err) {
-    console.error("Error publishing form:", err);
-    throw new Error("Something went wrong while publishing the form.");
   }
+
+  return res.json();
 }
