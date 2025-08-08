@@ -20,9 +20,9 @@ import {
 } from "@/types/form-types";
 import { ArrowLeft } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { submitForm } from "@/app/actions/submitForm";
+import { generateDynamicSchema } from "@/utils/validation";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -47,26 +47,8 @@ const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
 
   const schema = useMemo(() => {
     const questions = form?.questions || [];
-    let validationObj: any = {};
 
-    questions.forEach((q) => {
-      if (q.fieldType === "Switch") {
-        validationObj[`question_${q.id}`] = z.any();
-      } else {
-        if (q.required) {
-          validationObj[`question_${q.id}`] = z
-            .string({
-              required_error: "Required",
-              message: "Required",
-            })
-            .min(1, { message: "Required" });
-        } else {
-          validationObj[`question_${q.id}`] = z.string().optional();
-        }
-      }
-    });
-
-    return z.object(validationObj);
+    return generateDynamicSchema(questions);
   }, [form.questions]);
 
   const formHook = useForm({

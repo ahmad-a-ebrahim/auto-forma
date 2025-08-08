@@ -15,6 +15,13 @@
       "when": 1754323829918,
       "tag": "0001_mighty_rattler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1754679957434,
+      "tag": "0002_giant_impossible_man",
+      "breakpoints": true
     }
   ]
 }

@@ -1,8 +1,12 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import parsePhoneNumberFromString from "libphonenumber-js";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-export const MAX_FREE_FORMS = 3;
+export function validatePhone(val: string) {
+  const phoneNumber = parsePhoneNumberFromString(val || "");
+  return phoneNumber?.isValid() || false;
+}

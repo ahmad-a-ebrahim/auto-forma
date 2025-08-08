@@ -1,6 +1,6 @@
 import React from "react";
 import { getUserForms } from "@/app/actions/getUserForms";
-import { MAX_FREE_FORMS } from "@/lib/utils";
+import { MAX_FREE_FORMS } from "@/utils/constants";
 import SubscribeBtn from "@/components/admin/subscription/SubscribeBtn";
 import { auth } from "@/auth";
 import { getUserSubscription } from "@/app/actions/userSubscriptions";

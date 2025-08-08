@@ -1,14 +1,8 @@
 "use server";
 
+import { FieldType } from "@/types/form-types";
 import { baseUrl } from "@/utils/constants";
 import { revalidatePath } from "next/cache";
-
-export type FieldType =
-  | "RadioGroup"
-  | "Select"
-  | "Input"
-  | "Textarea"
-  | "Switch";
 
 type CreatePayload = {
   userId: string;

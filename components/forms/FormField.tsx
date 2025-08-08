@@ -26,10 +26,12 @@ import {
 } from "@/types/form-types";
 import { Minus, Plus } from "lucide-react";
 import { useFormContext } from "react-hook-form";
+import DatePicker from "../ui/date-picker";
+import { PhoneInput } from "../ui/phone-input";
 
 type Props = {
   element: QuestionSelectModel & { fieldOptions: FieldOptionSelectModel[] };
-  value: string;
+  value: string | Date;
   onChange: (val: any) => void;
   id: string;
   editMode?: boolean;
@@ -114,6 +116,10 @@ const FormField: React.FC<Props> = ({
                       "Switch",
                       "Select",
                       "RadioGroup",
+                      "Email",
+                      "Number",
+                      "Date",
+                      "Phone",
                     ].map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
@@ -196,27 +202,29 @@ const FormField: React.FC<Props> = ({
       <Input
         id={id}
         type="text"
+        value={value as string}
         onChange={(e) => onChange(String(e.target.value))}
       />
     ),
     Switch: () => (
       <Switch
         id={id}
+        value={value === "Yes" ? 1 : 0}
         onCheckedChange={(checked) => onChange(checked ? "Yes" : "No")}
       />
     ),
     Textarea: () => (
       <Textarea
         id={id}
-        value={value}
+        value={value as string}
         onChange={(e) => onChange(String(e.target.value))}
       />
     ),
     Select: () => (
-      <Select onValueChange={onChange}>
+      <Select defaultValue={value as string} onValueChange={onChange}>
         <SelectTrigger>
           <SelectValue
-            defaultValue={String(value)}
+            defaultValue={value as string}
             placeholder="Select option"
           />
         </SelectTrigger>
@@ -230,7 +238,7 @@ const FormField: React.FC<Props> = ({
       </Select>
     ),
     RadioGroup: () => (
-      <RadioGroup onValueChange={onChange}>
+      <RadioGroup defaultValue={value as string} onValueChange={onChange}>
         {element.fieldOptions.map((option) => (
           <div key={option.id} className="flex items-center space-x-2">
             <FormControl>
@@ -243,6 +251,33 @@ const FormField: React.FC<Props> = ({
           </div>
         ))}
       </RadioGroup>
+    ),
+    Email: () => (
+      <Input
+        id={id}
+        type="text"
+        value={value as string}
+        onChange={(e) => onChange(String(e.target.value))}
+      />
+    ),
+    Number: () => (
+      <Input
+        id={id}
+        type="number"
+        value={value as string}
+        onChange={(e) => onChange(String(e.target.value))}
+      />
+    ),
+    Date: () => (
+      <DatePicker
+        id={id}
+        value={value as Date}
+        onChange={onChange}
+        className="w-full"
+      />
+    ),
+    Phone: () => (
+      <PhoneInput id={id} value={value as string} onChange={onChange} />
     ),
   };
 

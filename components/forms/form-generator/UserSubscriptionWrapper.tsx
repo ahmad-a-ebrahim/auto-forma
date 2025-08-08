@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { getUserSubscription } from "@/app/actions/userSubscriptions";
 import { getUserFormsCount } from "@/app/actions/getUserFormsCount";
 import { Button } from "@/components/ui/button";
-import { MAX_FREE_FORMS } from "@/lib/utils";
+import { MAX_FREE_FORMS } from "@/utils/constants";
 import { Lock } from "lucide-react";
 
 export default async function UserSubscriptionWrapper({
