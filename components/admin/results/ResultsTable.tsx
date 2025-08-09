@@ -71,13 +71,16 @@ export function ResultsTable(
     ...props.columns.map((question: Question) => {
       return columnHelper.accessor(
         (row) => {
-          let answer = row.answers.find((answer: Answer) => {
-            return answer.questionId === question.id;
-          });
-          return answer?.fieldOption ? answer.fieldOption.text : answer?.value;
+          const answer: Answer | undefined = row.answers.find(
+            (a: Answer) => a.questionId === question.id
+          );
+
+          const value = answer?.fieldOption?.text ?? answer?.value ?? "—";
+
+          return value;
         },
         {
-          header: () => question.text,
+          header: () => question.text ?? "—",
           id: question.id.toString(),
           cell: (info) => info.renderValue(),
         }
@@ -110,7 +113,7 @@ export function ResultsTable(
   return (
     <div className="mt-4 space-y-4">
       <div className="shadow overflow-auto border border-gray-200 sm:rounded-lg h-[calc(100dvh-279px)] min-h-[400px]">
-        <table>
+        <table className="min-w-full">
           <thead className="sticky top-0 bg-background shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b">
@@ -131,7 +134,7 @@ export function ResultsTable(
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="py-2">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-3">
+                  <td key={cell.id} className="p-3 align-top">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
