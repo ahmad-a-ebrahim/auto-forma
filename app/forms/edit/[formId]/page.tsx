@@ -4,8 +4,7 @@ import { forms, questions } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import MessageUI from "@/components/MessageUI";
-import notFound from "@/public/not-found.svg";
-import security from "@/public/security.svg";
+import error from "@/public/error.svg";
 import EditForm from "@/components/forms/EditForm";
 
 const EditFormPage = async ({
@@ -18,7 +17,7 @@ const EditFormPage = async ({
   const formId = params.formId;
 
   if (!formId) {
-    return <MessageUI image={notFound} message="Form not found" />;
+    return <MessageUI image={error} message="Form not found" />;
   }
 
   const session = await auth();
@@ -36,13 +35,13 @@ const EditFormPage = async ({
   });
 
   if (!form) {
-    return <MessageUI image={notFound} message="Form not found" />;
+    return <MessageUI image={error} message="Form not found" />;
   }
 
   if (userId !== form?.userId) {
     return (
       <MessageUI
-        image={security}
+        image={error}
         message="You are not authorized to view this page"
       />
     );

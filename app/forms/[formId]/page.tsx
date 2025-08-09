@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { forms, questions } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import MessageUI from "@/components/MessageUI";
-import notFound from "@/public/not-found.svg";
+import error from "@/public/error.svg";
 import SubmitForm from "@/components/forms/SubmitForm";
 
 const SubmitFormPage = async ({
@@ -16,7 +16,7 @@ const SubmitFormPage = async ({
   const formId = params.formId;
 
   if (!formId) {
-    return <MessageUI image={notFound} message="Form not found" />;
+    return <MessageUI image={error} message="Form not found" />;
   }
 
   const form = await db.query.forms.findFirst({
@@ -32,7 +32,7 @@ const SubmitFormPage = async ({
   });
 
   if (!form || !form.published) {
-    return <MessageUI image={notFound} message="Form not found" />;
+    return <MessageUI image={error} message="Form not found" />;
   }
 
   const sanitizedForm = {

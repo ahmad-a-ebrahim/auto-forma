@@ -159,7 +159,7 @@ const EditForm: React.FC<Props> = ({ form: initialForm }) => {
         size="icon"
         variant={"ghost"}
         className="absolute top-1 left-1 sm:top-10 sm:left-10"
-        onClick={() => router.push("/view-forms")}
+        onClick={() => router.push("/my-forms")}
       >
         <ArrowLeft />
       </Button>

@@ -34,7 +34,7 @@ const Header = async (props: Props) => {
           <div>
             {session?.user ? (
               <div className="flex items-center gap-4">
-                <Link href="/view-forms">
+                <Link href="/my-forms">
                   <Button size="sm" variant="link">
                     Dashboard
                   </Button>

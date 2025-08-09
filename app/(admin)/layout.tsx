@@ -13,7 +13,7 @@ const dashboardConfig: {
   sidebarNav: [
     {
       title: "My Forms",
-      href: "/view-forms",
+      href: "/my-forms",
       icon: "library",
     },
     {
@@ -44,7 +44,7 @@ export default async function AdminLayout({
         </aside>
         <main className="flex w-full flex-1 flex-col overflow-hidden">
           <header className="flex flex-wrap gap-4 items-center justify-between p-2 sm:p-4">
-            <h1 className="text-2xl font-semibold">Dashboard</h1>
+            <h1 className="text-2xl">Dashboard</h1>
             <SessionProvider>
               <UserSubscriptionWrapper>
                 <FormGenerator size={"sm"} variant="secondary" />

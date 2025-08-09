@@ -150,7 +150,7 @@ const FormsList = (props: Props) => {
           </CardContent>
           <CardFooter className="flex flex-wrap justify-start gap-1">
             {form.published ? (
-              <Link href={`/results?formId=${form.id}`}>
+              <Link href={`/my-forms/results?formId=${form.id}`}>
                 <Button
                   variant="default"
                   className="w-full"

@@ -1,66 +1,74 @@
-import React from "react";
-import { ResultsTable } from "./ResultsTable";
-import { db } from "@/db";
-import { asc, eq } from "drizzle-orm";
-import { forms, questions } from "@/db/schema";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Form, ResultsTable } from "./ResultsTable";
 import MessageUI from "@/components/MessageUI";
-import notFound from "@/public/not-found.svg";
-import noData from "@/public/no-data.svg";
-import security from "@/public/security.svg";
-import { auth } from "@/auth";
+import empty from "@/public/no-data.svg";
+import error from "@/public/error.svg";
+import { getResults } from "@/app/actions/getResults";
+import { Button } from "@/components/ui/button";
+import { BarChart2, ListFilter } from "lucide-react";
 
 type Props = {
   formId: number;
 };
 
-const ResultsDisplay = async ({ formId }: Props) => {
-  const session = await auth();
-  const userId = session?.user?.id;
+const ResultsDisplay = ({ formId }: Props) => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{
+    form?: Form;
+    success: boolean;
+    message?: string;
+  } | null>(null);
 
-  const form = await db.query.forms.findFirst({
-    where: eq(forms.id, formId),
-    with: {
-      questions: {
-        with: {
-          fieldOptions: true,
-        },
-        orderBy: asc(questions.order),
-      },
-      submissions: {
-        with: {
-          answers: {
-            with: {
-              fieldOption: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  useEffect(() => {
+    (async () => {
+      const res = await getResults({ formId });
+      setData(res);
+      setLoading(false);
+    })();
+  }, [formId]);
 
-  if (!form || !form.published)
-    return <MessageUI image={notFound} message="Form not found" disableBtn />;
-
-  if (!userId || userId !== form.userId)
+  if (loading)
     return (
-      <MessageUI
-        image={security}
-        message="You are not authorized to view this page"
-        disableBtn
-      />
+      <div className="text-center">Getting your results, please wait...</div>
     );
 
-  if (!form.submissions.length)
+  if (!data?.success) {
+    return (
+      <MessageUI image={error} message={data?.message as string} disableBtn />
+    );
+  }
+
+  const form = data.form;
+
+  if (!form?.submissions.length)
     return (
       <MessageUI
-        image={noData}
+        image={empty}
         message="No submissions on this form yet"
         disableBtn
       />
     );
 
   return (
-    <div>
+    <div className="flex flex-col">
+      <div className="w-full flex flex-wrap items-center justify-between gap-1">
+        <div className="flex items-center gap-1">
+          <Button variant={"outline"}>
+            <ListFilter />
+            Filter data
+          </Button>
+          <Button variant={"outline"}>
+            <ListFilter />
+            Filter columns
+          </Button>
+        </div>
+        <Button className="self-end">
+          <BarChart2 />
+          Generate analytics
+        </Button>
+      </div>
       <ResultsTable data={form.submissions} columns={form.questions} />
     </div>
   );

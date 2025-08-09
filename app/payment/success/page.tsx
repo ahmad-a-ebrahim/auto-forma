@@ -13,7 +13,7 @@ const PaymentSuccessPage = () => {
         </AlertTitle>
         <AlertDescription className="text-center text-base">
           Your account has been updated.{" "}
-          <Link href="/view-forms" className="underline text-primary">
+          <Link href="/my-forms" className="underline text-primary">
             Go to the dashboard
           </Link>{" "}
           to create more forms.

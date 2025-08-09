@@ -13,8 +13,17 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
 
 type FieldOption = InferSelectModel<typeof fieldOptions>;
 
@@ -58,7 +67,7 @@ export function ResultsTable(props: TableProps) {
             return answer.questionId === question.id;
           });
 
-          return answer.fieldOption ? answer.fieldOption.text : answer.value;
+          return answer?.fieldOption ? answer.fieldOption.text : answer?.value;
         },
         {
           header: () => question.text,
@@ -69,17 +78,29 @@ export function ResultsTable(props: TableProps) {
     }),
   ];
 
+  const [pageSize, setPageSize] = React.useState(10);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: pageSize,
+      },
+    },
   });
 
+  React.useEffect(() => {
+    table.setPageSize(pageSize);
+  }, [pageSize, table]);
+
   return (
-    <div className="mt-4">
-      <div className="shadow overflow-auto border border-gray-200 sm:rounded-lg">
+    <div className="mt-4 space-y-4">
+      <div className="shadow overflow-auto border border-gray-200 sm:rounded-lg h-[calc(100dvh-279px)] min-h-[400px]">
         <table>
-          <thead>
+          <thead className="sticky top-0 bg-background shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b">
                 {headerGroup.headers.map((header) => (
@@ -107,6 +128,51 @@ export function ResultsTable(props: TableProps) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-1">
+          <Button
+            variant={"outline"}
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Back
+          </Button>
+          <Button
+            variant={"outline"}
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+
+        <div className="text-sm text-muted-foreground font-medium">
+          {`Page ${
+            table.getState().pagination.pageIndex + 1
+          } of ${table.getPageCount()}`}
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
+          <span className="whitespace-nowrap">Rows per page:</span>
+          <Select
+            defaultValue={String(pageSize)}
+            onValueChange={(value: string) => setPageSize(parseInt(value))}
+          >
+            <SelectTrigger className="w-14 h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 20, 50].map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

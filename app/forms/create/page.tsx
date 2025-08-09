@@ -108,7 +108,7 @@ const CreateFormPage: React.FC = () => {
           title: "Success",
           description: "Form created",
         });
-        router.push("/view-forms");
+        router.push("/my-forms");
       } else {
         toast({
           variant: "destructive",
@@ -133,7 +133,7 @@ const CreateFormPage: React.FC = () => {
         size="icon"
         variant="ghost"
         className="absolute top-1 left-1 sm:top-10 sm:left-10"
-        onClick={() => router.push("/view-forms")}
+        onClick={() => router.push("/my-forms")}
       >
         <ArrowLeft />
       </Button>
