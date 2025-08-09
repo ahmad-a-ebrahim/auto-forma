@@ -53,12 +53,20 @@ interface TableProps {
 
 const columnHelper = createColumnHelper<any>();
 
-export function ResultsTable(props: TableProps) {
-  const { data } = props;
+export function ResultsTable(
+  props: TableProps & {
+    columnVisibility: Record<string, boolean>;
+    setColumnVisibility: React.Dispatch<
+      React.SetStateAction<Record<string, boolean>>
+    >;
+  }
+) {
+  const { data, columnVisibility, setColumnVisibility } = props;
 
   const columns = [
     columnHelper.accessor("id", {
       cell: (info) => info.getValue(),
+      header: "ID",
     }),
     ...props.columns.map((question: Question) => {
       return columnHelper.accessor(
@@ -66,7 +74,6 @@ export function ResultsTable(props: TableProps) {
           let answer = row.answers.find((answer: Answer) => {
             return answer.questionId === question.id;
           });
-
           return answer?.fieldOption ? answer.fieldOption.text : answer?.value;
         },
         {
@@ -83,6 +90,10 @@ export function ResultsTable(props: TableProps) {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      columnVisibility,
+    },
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
