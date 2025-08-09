@@ -20,7 +20,6 @@ import type {
   QuestionSelectModel,
   FieldOptionSelectModel,
 } from "@/types/form-types";
-import { useSession } from "next-auth/react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -40,8 +39,6 @@ interface QuestionWithOptions extends QuestionSelectModel {
 const CreateFormPage: React.FC = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const session = useSession();
-  const userId = session.data?.user?.id;
 
   const defaultValues: {
     name: string;
@@ -100,7 +97,6 @@ const CreateFormPage: React.FC = () => {
       setIsLoading(true);
 
       const res = await createForm({
-        userId: userId ?? "",
         name,
         description,
         questions: cleanedQuestions,

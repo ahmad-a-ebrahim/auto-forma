@@ -1,12 +1,20 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { forms, questions, fieldOptions } from "@/db/schema";
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const data = await request.json();
-    const { userId, name, description, questions: qs } = data;
+    const session = await auth();
+    const userId = session?.user?.id;
 
-    if (!userId || !name || !description || !Array.isArray(qs)) {
+    if (!userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const data = await request.json();
+    const { name, description, questions: qs } = data;
+
+    if (!name || !description || !Array.isArray(qs)) {
       return Response.json({ error: "Invalid data" }, { status: 400 });
     }
 
@@ -47,7 +55,7 @@ export async function POST(request: Request): Promise<Response> {
       return newForm;
     });
 
-    return Response.json({ success: true, id: result.id }, { status: 200 });
+    return Response.json({ success: true, id: result.id }, { status: 201 });
   } catch (err) {
     console.error(err);
 

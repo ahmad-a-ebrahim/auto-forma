@@ -10,12 +10,12 @@ export async function submitForm(data: {
     fieldOptionsId?: number | null;
   }[];
 }) {
-  const res = await fetch(`${baseUrl}/api/forms/submit`, {
+  const res = await fetch(`${baseUrl}/api/forms/submit/${data.formId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({ answers: data.answers }),
   });
 
   return res.json();

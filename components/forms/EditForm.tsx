@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { updateFormQuestions } from "@/app/actions/updateFormQuestions";
+import { updateForm } from "@/app/actions/updateForm";
 import { useRouter } from "next/navigation";
 import FormField from "./FormField";
 import {
@@ -34,7 +34,6 @@ import {
 } from "@hello-pangea/dnd";
 import { formSchema } from "@/utils/validation";
 import { useToast } from "@/hooks/use-toast";
-import { useSession } from "next-auth/react";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -53,9 +52,6 @@ type Props = {
 const EditForm: React.FC<Props> = ({ form: initialForm }) => {
   const { toast } = useToast();
   const router = useRouter();
-
-  const session = useSession();
-  const userId = session.data?.user?.id;
 
   const defaultValues = useMemo(
     (): {
@@ -105,22 +101,23 @@ const EditForm: React.FC<Props> = ({ form: initialForm }) => {
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true);
-      const res = await updateFormQuestions({
-        userId,
+      const res = await updateForm({
         formId: initialForm.id,
-        name,
-        description,
-        questions: questions.map((q) => ({
-          id: q.id,
-          text: q.text ?? "",
-          fieldType: q.fieldType ?? "Input",
-          fieldOptions: q.fieldOptions.map((opt) => ({
-            text: opt.text ?? "",
-            value: opt.value ?? "",
+        data: {
+          name,
+          description,
+          questions: questions.map((q) => ({
+            id: q.id,
+            text: q.text ?? "",
+            fieldType: q.fieldType ?? "Input",
+            fieldOptions: q.fieldOptions.map((opt) => ({
+              text: opt.text ?? "",
+              value: opt.value ?? "",
+            })),
+            required: q.required,
+            order: q.order,
           })),
-          required: q.required,
-          order: q.order,
-        })),
+        },
       });
 
       if (res.success) {

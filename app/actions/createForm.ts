@@ -3,9 +3,9 @@
 import { FieldType } from "@/types/form-types";
 import { baseUrl } from "@/utils/constants";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 type CreatePayload = {
-  userId: string;
   name: string;
   description: string;
   questions: {
@@ -19,10 +19,16 @@ type CreatePayload = {
 };
 
 export async function createForm(payload: CreatePayload) {
+  const cookieHeader = cookies()
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+
   const res = await fetch(`${baseUrl}/api/forms/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Cookie: cookieHeader,
     },
     body: JSON.stringify(payload),
   });

@@ -7,7 +7,6 @@ import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
 import security from "@/public/security.svg";
 import EditForm from "@/components/forms/EditForm";
-import { SessionProvider } from "next-auth/react";
 
 const EditFormPage = async ({
   params,
@@ -66,11 +65,7 @@ const EditFormPage = async ({
     })),
   };
 
-  return (
-    <SessionProvider>
-      <EditForm form={sanitizedForm} />
-    </SessionProvider>
-  );
+  return <EditForm form={sanitizedForm} />;
 };
 
 export default EditFormPage;

@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { forms, questions as dbQuestions, fieldOptions } from "@/db/schema";
 import { InferInsertModel } from "drizzle-orm";
@@ -12,12 +13,15 @@ interface SaveFormData extends Form {
 
 export async function POST(req: Request): Promise<Response> {
   try {
-    const data = (await req.json()) as SaveFormData;
-    const { userId, name, description, questions } = data;
+    const session = await auth();
+    const userId = session?.user?.id;
 
     if (!userId) {
-      return Response.json({ error: "Unauthorized" }, { status: 403 });
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const data = (await req.json()) as SaveFormData;
+    const { name, description, questions } = data;
 
     if (!name || !description || !Array.isArray(questions)) {
       return Response.json({ error: "Invalid data" }, { status: 400 });
@@ -67,7 +71,7 @@ export async function POST(req: Request): Promise<Response> {
       }
     });
 
-    return Response.json({ success: true, formId }, { status: 200 });
+    return Response.json({ success: true, formId }, { status: 201 });
   } catch (err) {
     console.error(err);
 

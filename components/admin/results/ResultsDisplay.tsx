@@ -6,12 +6,17 @@ import { forms, questions } from "@/db/schema";
 import MessageUI from "@/components/MessageUI";
 import notFound from "@/public/not-found.svg";
 import noData from "@/public/no-data.svg";
+import security from "@/public/security.svg";
+import { auth } from "@/auth";
 
 type Props = {
   formId: number;
 };
 
 const ResultsDisplay = async ({ formId }: Props) => {
+  const session = await auth();
+  const userId = session?.user?.id;
+
   const form = await db.query.forms.findFirst({
     where: eq(forms.id, formId),
     with: {
@@ -34,10 +39,13 @@ const ResultsDisplay = async ({ formId }: Props) => {
   });
 
   if (!form || !form.published)
+    return <MessageUI image={notFound} message="Form not found" disableBtn />;
+
+  if (!userId || userId !== form.userId)
     return (
       <MessageUI
-        image={notFound}
-        message="This form is not found"
+        image={security}
+        message="You are not authorized to view this page"
         disableBtn
       />
     );

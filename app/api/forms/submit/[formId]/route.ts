@@ -2,16 +2,25 @@ import { db } from "@/db";
 import { formSubmissions, answers as dbAnswers, forms } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function POST(request: Request): Promise<Response> {
+export async function POST(
+  request: Request,
+  { params }: { params: { formId: string } }
+): Promise<Response> {
   try {
+    const formId = parseInt(params.formId);
+
+    if (!formId) {
+      return Response.json({ error: "Form ID is required" }, { status: 400 });
+    }
+
     const data = await request.json();
 
-    if (!data.formId || !Array.isArray(data.answers)) {
+    if (!Array.isArray(data.answers)) {
       return Response.json({ error: "Invalid data" }, { status: 400 });
     }
 
     const form = await db.query.forms.findFirst({
-      where: eq(forms.id, data.formId),
+      where: eq(forms.id, formId),
     });
 
     if (!form) {
@@ -24,7 +33,7 @@ export async function POST(request: Request): Promise<Response> {
       const newFormSubmission = await tx
         .insert(formSubmissions)
         .values({
-          formId: data.formId,
+          formId,
         })
         .returning({
           insertedId: formSubmissions.id,

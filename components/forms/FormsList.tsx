@@ -16,7 +16,6 @@ import Link from "next/link";
 import FormPublishSuccess from "./FormPublishSuccess";
 import { BarChart, Copy, Edit, Globe, Trash } from "lucide-react";
 import { deleteForm } from "@/app/actions/deleteForm";
-import { useSession } from "next-auth/react";
 import MessageUI from "../MessageUI";
 import idea from "@/public/idea.svg";
 import { publishForm } from "@/app/actions/mutateForm";
@@ -44,15 +43,10 @@ const FormsList = (props: Props) => {
   const [formId, setFormId] = useState<number>();
   const [isPending, startTransition] = useTransition();
 
-  const session = useSession();
-  const userId = session.data?.user?.id;
-
   const handleDelete = (form_id: number) => {
-    if (!userId) return;
-
     startTransition(async () => {
       try {
-        const res = await deleteForm({ formId: form_id, userId });
+        const res = await deleteForm({ formId: form_id });
         if (res.success) {
           toast({
             variant: "success",
@@ -80,7 +74,7 @@ const FormsList = (props: Props) => {
   const handlePublish = async (form_id: number) => {
     startTransition(async () => {
       try {
-        const res = await publishForm(form_id);
+        const res = await publishForm({ formId: form_id });
         if (res.success) {
           toast({
             variant: "success",

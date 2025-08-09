@@ -1,19 +1,30 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { forms, questions, fieldOptions } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 
-export async function POST(request: Request): Promise<Response> {
+export async function POST(
+  request: Request,
+  { params }: { params: { formId: string } }
+): Promise<Response> {
   try {
-    const data = await request.json();
-    const { userId, formId, name, description, questions: updatedQs } = data;
+    const session = await auth();
+    const userId = session?.user?.id;
 
-    if (
-      !userId ||
-      !formId ||
-      !name ||
-      !description ||
-      !Array.isArray(updatedQs)
-    ) {
+    if (!userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const formId = parseInt(params.formId);
+
+    if (!formId) {
+      return Response.json({ error: "Form ID is required" }, { status: 400 });
+    }
+
+    const data = await request.json();
+    const { name, description, questions: updatedQs } = data;
+
+    if (!name || !description || !Array.isArray(updatedQs)) {
       return Response.json({ error: "Invalid data" }, { status: 400 });
     }
 
@@ -25,8 +36,8 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: "Form not found" }, { status: 404 });
     }
 
-    if (String(form.userId) !== String(userId)) {
-      return Response.json({ error: "Unauthorized" }, { status: 403 });
+    if (form.userId !== userId) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     if (form.published) {

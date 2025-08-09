@@ -48,6 +48,12 @@ export async function generateForm(
     const session = await auth();
     const userId = session?.user?.id;
 
+    if (!userId) {
+      return {
+        message: "Unauthorized",
+      };
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
       contents: `${data.description} ${promptExplanation}`,
@@ -58,7 +64,6 @@ export async function generateForm(
     const responseObj = JSON.parse(responseJSON);
 
     const res = await saveForm({
-      userId,
       name: responseObj.name,
       description: responseObj.description,
       questions: responseObj.questions,

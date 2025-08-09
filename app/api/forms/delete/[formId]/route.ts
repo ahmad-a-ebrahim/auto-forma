@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import {
   answers,
@@ -8,16 +9,22 @@ import {
 } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 
-export async function POST(request: Request): Promise<Response> {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { formId: string } }
+): Promise<Response> {
   try {
-    const data = await request.json();
-    const { formId, userId } = data;
+    const session = await auth();
+    const userId = session?.user?.id;
 
-    if (!formId || !userId) {
-      return Response.json(
-        { error: "Missing formId or userId" },
-        { status: 400 }
-      );
+    if (!userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const formId = parseInt(params.formId);
+
+    if (!formId) {
+      return Response.json({ error: "Form ID is required" }, { status: 400 });
     }
 
     const form = await db.query.forms.findFirst({
@@ -28,8 +35,8 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: "Form not found" }, { status: 404 });
     }
 
-    if (String(form.userId) !== String(userId)) {
-      return Response.json({ error: "Unauthorized" }, { status: 403 });
+    if (form.userId !== userId) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await db.transaction(async (tx) => {
@@ -84,7 +91,7 @@ export async function POST(request: Request): Promise<Response> {
       await tx.delete(forms).where(eq(forms.id, formId));
     });
 
-    return Response.json({ success: true, formId: form.id }, { status: 200 });
+    return Response.json({ success: true, formId }, { status: 200 });
   } catch (err: any) {
     console.error(err);
 

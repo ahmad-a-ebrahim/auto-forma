@@ -1,13 +1,24 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { forms } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request,
+  { params }: { params: { formId: string } }
+) {
   try {
-    const { formId } = await req.json();
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const formId = parseInt(params.formId);
 
     if (!formId) {
-      return Response.json({ error: "Form ID is required" }, { status: 422 });
+      return Response.json({ error: "Form ID is required" }, { status: 400 });
     }
 
     const form = await db.query.forms.findFirst({
@@ -16,6 +27,10 @@ export async function POST(req: Request) {
 
     if (!form) {
       return Response.json({ error: "Form not found" }, { status: 404 });
+    }
+
+    if (form.userId !== userId) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     if (form.published) {
