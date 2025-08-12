@@ -7,7 +7,7 @@ import empty from "@/public/no-data.svg";
 import error from "@/public/error.svg";
 import { getResults } from "@/app/actions/getResults";
 import { Button } from "@/components/ui/button";
-import { BarChart2, ListFilter, Columns } from "lucide-react";
+import { BarChart2, ListFilter, Columns, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 type Props = {
   formId: number;
@@ -38,6 +39,8 @@ const ANY_SENTINEL = "__ANY__";
 const SELECT_LIKE = ["Select", "RadioGroup"];
 
 const ResultsDisplay = ({ formId }: Props) => {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{
     form?: Form;
@@ -134,7 +137,10 @@ const ResultsDisplay = ({ formId }: Props) => {
 
   if (loading)
     return (
-      <div className="text-center">Getting your results, please wait...</div>
+      <div className="text-center py-10 flex justify-center items-center gap-2">
+        <Loader2 className="animate-spin" />
+        <span>Getting your results, please wait...</span>
+      </div>
     );
 
   if (!data?.success) {
@@ -324,7 +330,10 @@ const ResultsDisplay = ({ formId }: Props) => {
           </Dialog>
         </div>
 
-        <Button className="self-end">
+        <Button
+          className="self-end"
+          onClick={() => router.push(`/my-forms/results/analytics/${formId}`)}
+        >
           <BarChart2 />
           Generate analytics
         </Button>
