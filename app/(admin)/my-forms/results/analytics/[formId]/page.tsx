@@ -154,7 +154,7 @@ export default function AnalyticsPage({
           </Button>
 
           {analyticsResult && (
-            <section className="mt-6 p-4">
+            <section className="mt-5">
               <h2 className="font-semibold mb-2">Analytics Result:</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                 {Object.entries(analyticsResult).map(
