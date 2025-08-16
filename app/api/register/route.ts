@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     if (user) {
       return Response.json(
-        { error: "This email is already exist" },
+        { error: "This email is already exists" },
         { status: 400 }
       );
     }

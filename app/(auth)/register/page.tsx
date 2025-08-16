@@ -92,6 +92,15 @@ export default function RegisterPage() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex items-center justify-evenly gap-7 min-h-screen p-4"
       >
+        <div aria-hidden="true" className="sr-only">
+          <input type="text" name="fake-username" autoComplete="username" />
+          <input
+            type="password"
+            name="fake-password"
+            autoComplete="new-password"
+          />
+        </div>
+
         <Image
           src={registerImage}
           alt="Sign Up"
