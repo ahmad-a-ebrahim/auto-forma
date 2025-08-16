@@ -27,7 +27,7 @@ const UpgradeAccBtn = async () => {
   const percent = Math.min((formCount / MAX_FREE_FORMS) * 100, 100);
 
   return (
-    <div className="text-left text-sm flex flex-col gap-4">
+    <div className="text-left text-sm flex flex-col gap-4 max-w-sm">
       <ProgressBar value={percent} />
       <div className="leading-6">
         <p>

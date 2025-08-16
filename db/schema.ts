@@ -26,11 +26,12 @@ export const formElements = pgEnum("field_type", [
 export const users = pgTable("user", {
   id: text("id").notNull().primaryKey(),
   name: text("name"),
-  email: text("email").notNull(),
+  email: text("email").notNull().unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   stripeCustomerId: text("stripe_customer_id"),
   subscribed: boolean("subscribed"),
+  password: text("password"),
 });
 
 export const accounts = pgTable(

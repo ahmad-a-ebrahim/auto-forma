@@ -3,7 +3,7 @@ import { auth, signOut } from "@/auth";
 import { Button } from "./button";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/public/logo.png";
+import { CircleUser, User } from "lucide-react";
 
 type Props = {};
 
@@ -39,19 +39,22 @@ const Header = async (props: Props) => {
                     Dashboard
                   </Button>
                 </Link>
-                {session.user.name && session.user.image && (
+                {session.user && session.user.name && session.user.image && (
                   <Image
                     src={session.user.image}
                     alt={session.user.name}
                     width={32}
                     height={32}
-                    className="rounded-full"
+                    className="rounded-full object-cover !w-8 !h-8"
                   />
+                )}
+                {session.user && !session.user.image && (
+                  <CircleUser className="w-7 h-7 text-gray-500" />
                 )}
                 <SignOut />
               </div>
             ) : (
-              <Link href="/api/auth/signin">
+              <Link href="/signin">
                 <Button variant="link">Sign in</Button>
               </Link>
             )}
