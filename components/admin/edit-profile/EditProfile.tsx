@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 const schema = z
   .object({
@@ -100,7 +100,6 @@ export default function EditProfile() {
           description: data?.error || "Something went wrong",
         });
       } else {
-        await getSession();
         toast({
           variant: "success",
           title: "Success",
@@ -136,6 +135,15 @@ export default function EditProfile() {
         className="space-y-6 p-4 border rounded-md w-full"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div aria-hidden="true" className="sr-only">
+            <input type="text" name="fake-username" autoComplete="username" />
+            <input
+              type="password"
+              name="fake-password"
+              autoComplete="new-password"
+            />
+          </div>
+
           {/* Name */}
           <FormField
             control={form.control}

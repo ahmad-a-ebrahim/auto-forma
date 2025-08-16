@@ -1,6 +1,7 @@
 import { hash } from "bcryptjs";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
   try {
@@ -8,6 +9,17 @@ export async function POST(req: Request) {
 
     if (!name || !email || !password) {
       return Response.json({ error: "Invalid data" }, { status: 400 });
+    }
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (user) {
+      return Response.json(
+        { error: "This email is already exist" },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await hash(password, 10);
