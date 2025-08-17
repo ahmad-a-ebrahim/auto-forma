@@ -32,6 +32,7 @@ export async function getResults({ formId }: { formId: number }) {
                 fieldOption: true,
               },
             },
+            user: true,
           },
         },
       },

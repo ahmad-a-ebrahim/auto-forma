@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { formSubmissions, answers as dbAnswers, forms } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -7,6 +8,9 @@ export async function POST(
   { params }: { params: { formId: string } }
 ): Promise<Response> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id ?? null;
+
     const formId = parseInt(params.formId);
 
     if (!formId) {
@@ -33,6 +37,7 @@ export async function POST(
       const newFormSubmission = await tx
         .insert(formSubmissions)
         .values({
+          userId: data.isAnon ? null : userId,
           formId,
         })
         .returning({

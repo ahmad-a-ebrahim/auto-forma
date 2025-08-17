@@ -152,12 +152,17 @@ export const answersRelations = relations(answers, ({ one }) => ({
 
 export const formSubmissions = pgTable("form_submissions", {
   id: serial("id").primaryKey(),
+  userId: text("user_id"),
   formId: integer("form_id"),
 });
 
 export const formSubmissionsRelations = relations(
   formSubmissions,
   ({ one, many }) => ({
+    user: one(users, {
+      fields: [formSubmissions.userId],
+      references: [users.id],
+    }),
     form: one(forms, {
       fields: [formSubmissions.formId],
       references: [forms.id],

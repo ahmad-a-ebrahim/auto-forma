@@ -23,6 +23,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { submitForm } from "@/app/actions/submitForm";
 import { generateDynamicSchema } from "@/utils/validation";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import hatGlasses from "@/public/hat-glasses.svg";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 interface QuestionWithOptions extends QuestionSelectModel {
   fieldOptions: FieldOptionSelectModel[];
@@ -42,8 +47,11 @@ type Props = {
 const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
   const { toast } = useToast();
   const router = useRouter();
+  const session = useSession();
+  const user = session.data?.user;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnon, setIsAnon] = useState(false);
 
   const schema = useMemo(() => {
     const questions = form?.questions || [];
@@ -84,6 +92,7 @@ const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
 
       const res = await submitForm({
         formId: form.id,
+        isAnon,
         answers,
       });
 
@@ -165,6 +174,25 @@ const SubmitForm: React.FC<Props> = ({ form, previewMode = false }) => {
               />
             </div>
           ))}
+
+          {user && (
+            <div className="flex items-center gap-5 mb-4 p-4 bg-secondary rounded-md">
+              <Label htmlFor="anon" className="flex gap-2.5 items-center">
+                <Image
+                  src={hatGlasses}
+                  width={24}
+                  height={24}
+                  alt="Hat glasses"
+                />
+                Answer as anonymous
+              </Label>
+              <Switch
+                id="anon"
+                checked={isAnon}
+                onCheckedChange={(checked) => setIsAnon(checked)}
+              />
+            </div>
+          )}
 
           <Button disabled={isLoading} type="submit" className="w-full">
             Submit

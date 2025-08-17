@@ -8,6 +8,7 @@ import {
   formSubmissions,
   questions,
   fieldOptions,
+  users,
 } from "@/db/schema";
 import {
   createColumnHelper,
@@ -36,8 +37,11 @@ type Question = InferSelectModel<typeof questions> & {
   fieldOptions: FieldOption[];
 };
 
+type User = InferSelectModel<typeof users>;
+
 type FormSubmission = InferSelectModel<typeof formSubmissions> & {
   answers: Answer[];
+  user?: User | null;
 };
 
 export type Form =
@@ -54,6 +58,54 @@ interface TableProps {
 
 const columnHelper = createColumnHelper<any>();
 
+function UserCell({ user }: { user?: User | null }) {
+  const displayName = user?.name ?? user?.email ?? "Anonymous";
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((p) => p[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : (user?.email ?? "A").slice(0, 1).toUpperCase();
+
+  return (
+    <div className="flex items-center gap-3">
+      {user?.image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={user.image}
+          alt={displayName}
+          className="max-w-8 max-h-8 min-w-8 min-h-8 rounded-full object-cover"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+            const parent = e.currentTarget.parentElement;
+            if (parent) {
+              const fallback = document.createElement("div");
+              fallback.className =
+                "w-8 h-8 rounded-full flex items-center justify-center bg-muted text-xs font-medium";
+              fallback.textContent = initials;
+              parent.insertBefore(fallback, e.currentTarget);
+            }
+          }}
+        />
+      ) : (
+        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted text-xs font-medium">
+          {initials}
+        </div>
+      )}
+
+      <div className="text-sm">
+        <div className="font-medium">{displayName}</div>
+        {user?.email && (
+          <div className="text-xs text-muted-foreground">{user.email}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ResultsTable(
   props: TableProps & {
     columnVisibility: Record<string, boolean>;
@@ -69,6 +121,17 @@ export function ResultsTable(
       cell: (info) => info.getValue(),
       header: "ID",
     }),
+
+    // User Column
+    columnHelper.accessor((row: FormSubmission) => row.user, {
+      id: "user",
+      header: "User",
+      cell: (info) => {
+        const user = info.getValue() as User | null | undefined;
+        return <UserCell user={user} />;
+      },
+    }),
+
     ...props.columns.map((question: Question) => {
       return columnHelper.accessor(
         (row) => {

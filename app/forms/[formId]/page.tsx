@@ -5,6 +5,7 @@ import { asc, eq } from "drizzle-orm";
 import MessageUI from "@/components/MessageUI";
 import error from "@/public/error.svg";
 import SubmitForm from "@/components/forms/SubmitForm";
+import { SessionProvider } from "next-auth/react";
 
 const SubmitFormPage = async ({
   params,
@@ -53,7 +54,11 @@ const SubmitFormPage = async ({
     })),
   };
 
-  return <SubmitForm form={sanitizedForm} />;
+  return (
+    <SessionProvider>
+      <SubmitForm form={sanitizedForm} />
+    </SessionProvider>
+  );
 };
 
 export default SubmitFormPage;

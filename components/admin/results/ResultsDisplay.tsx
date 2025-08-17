@@ -71,6 +71,10 @@ const ResultsDisplay = ({ formId }: Props) => {
         });
         // keep ID visible by default
         initialVisibility["id"] = true;
+
+        // show user column by default
+        initialVisibility["user"] = true;
+
         setColumnVisibility(initialVisibility);
       }
       setData(res);
