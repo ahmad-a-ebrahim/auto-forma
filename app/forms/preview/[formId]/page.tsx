@@ -6,6 +6,7 @@ import MessageUI from "@/components/MessageUI";
 import error from "@/public/error.svg";
 import { auth } from "@/auth";
 import SubmitForm from "@/components/forms/SubmitForm";
+import { SessionProvider } from "next-auth/react";
 
 const PreviewFormPage = async ({
   params,
@@ -64,7 +65,11 @@ const PreviewFormPage = async ({
     })),
   };
 
-  return <SubmitForm form={sanitizedForm} previewMode={true} />;
+  return (
+    <SessionProvider>
+      <SubmitForm form={sanitizedForm} previewMode={true} />
+    </SessionProvider>
+  );
 };
 
 export default PreviewFormPage;
