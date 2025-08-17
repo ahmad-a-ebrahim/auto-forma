@@ -118,14 +118,16 @@ export default function EditProfile() {
   };
 
   React.useEffect(() => {
-    form.reset({
-      name: session.data?.user?.name || "",
-      email: session.data?.user?.email || "",
-      oldPassword: "",
-      newPassword: "",
-      passwordConfirmation: "",
-      image: undefined,
-    });
+    if (session) {
+      form.reset({
+        name: session?.data?.user?.name || "",
+        email: session?.data?.user?.email || "",
+        oldPassword: "",
+        newPassword: "",
+        passwordConfirmation: "",
+        image: undefined,
+      });
+    }
   }, [form, session]);
 
   return (

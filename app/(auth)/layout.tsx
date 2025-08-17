@@ -5,7 +5,7 @@ import { PropsWithChildren } from "react";
 const AuthLayout = async ({ children }: PropsWithChildren) => {
   const session = await auth();
 
-  if (session?.user) redirect("/");
+  if (session?.user) redirect("/my-forms");
 
   return children;
 };

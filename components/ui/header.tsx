@@ -3,7 +3,7 @@ import { auth, signOut } from "@/auth";
 import { Button } from "./button";
 import Image from "next/image";
 import Link from "next/link";
-import { CircleUser, User } from "lucide-react";
+import { CircleUser } from "lucide-react";
 
 type Props = {};
 
@@ -24,12 +24,12 @@ function SignOut() {
 
 const Header = async (props: Props) => {
   const session = await auth();
+  const user = session?.user;
 
   return (
     <header className="border bottom-1">
       <nav className="bg-white border-gray-200 px-4 py-2.5">
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-          {/* <Image src={logo} alt="Logo" className='w-20 rounded-md' /> */}
           <p>AutoForma</p>
           <div>
             {session?.user ? (
@@ -39,16 +39,16 @@ const Header = async (props: Props) => {
                     Dashboard
                   </Button>
                 </Link>
-                {session.user && session.user.name && session.user.image && (
+                {user && user.image && (
                   <Image
-                    src={session.user.image}
-                    alt={session.user.name}
+                    src={user.image}
+                    alt={"Profile image"}
                     width={32}
                     height={32}
                     className="rounded-full object-cover !w-8 !h-8"
                   />
                 )}
-                {session.user && !session.user.image && (
+                {user && !user.image && (
                   <CircleUser className="w-7 h-7 text-gray-500" />
                 )}
                 <SignOut />

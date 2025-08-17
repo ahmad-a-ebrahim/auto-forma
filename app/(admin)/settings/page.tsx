@@ -1,5 +1,5 @@
 import React from "react";
-import { auth, signIn } from "@/auth";
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,14 +10,12 @@ import { SessionProvider } from "next-auth/react";
 
 const SettingsPage = async () => {
   const session = await auth();
+  const userId = session?.user?.id;
 
-  if (!session || !session.user || !session.user.id) {
-    signIn();
-    return null;
-  }
+  if (!userId) return <></>;
 
   const user = await db.query.users.findFirst({
-    where: eq(users.id, session.user.id),
+    where: eq(users.id, userId),
   });
 
   const plan = user?.subscribed ? "premium" : "free";
@@ -30,7 +28,7 @@ const SettingsPage = async () => {
       </SessionProvider>
 
       <h1 className="text-xl font-[500]">Subscription Details</h1>
-      <div className="p-4 border rounded-md w-full">
+      <div className="p-4 border rounded-md w-full space-y-4">
         <p>You currently are on a {plan} plan</p>
         {user?.subscribed ? <ManageSubscription /> : <UpgradeAccBtn />}
       </div>

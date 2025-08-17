@@ -24,6 +24,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
+import { getFormattedDate } from "@/lib/utils";
 
 type FieldOption = InferSelectModel<typeof fieldOptions>;
 
@@ -75,7 +76,10 @@ export function ResultsTable(
             (a: Answer) => a.questionId === question.id
           );
 
-          const value = answer?.fieldOption?.text ?? answer?.value ?? "—";
+          const value = answer?.fieldOption?.text ?? answer?.value ?? "-";
+
+          if (question.fieldType === "Date" && value !== "-")
+            return getFormattedDate(value);
 
           return value;
         },
