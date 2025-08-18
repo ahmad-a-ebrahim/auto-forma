@@ -15,7 +15,13 @@ const relevantEvents = new Set([
 export async function POST(req: Request) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature") as string;
-  if (!process.env.STRIPE_WEBHOOK_LOCAL_SECRET) {
+
+  const webhookSecret =
+  process.env.NODE_ENV === "development"
+    ? process.env.STRIPE_WEBHOOK_LOCAL_SECRET
+    : process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
     throw new Error("STRIPE_WEBHOOK_LOCAL_SECRET is not set");
   }
 
@@ -24,7 +30,7 @@ export async function POST(req: Request) {
   const event = stripe.webhooks.constructEvent(
     body,
     sig,
-    process.env.STRIPE_WEBHOOK_LOCAL_SECRET
+    webhookSecret
   );
 
   const data = event.data.object as Stripe.Subscription;
