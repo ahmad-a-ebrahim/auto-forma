@@ -1,9 +1,10 @@
 import { InferSelectModel } from "drizzle-orm";
-import { forms, questions, fieldOptions } from "@/db/schema";
+import { forms, questions, fieldOptions, users } from "@/db/schema";
 
 export type FormSelectModel = InferSelectModel<typeof forms>;
 export type QuestionSelectModel = InferSelectModel<typeof questions>;
 export type FieldOptionSelectModel = InferSelectModel<typeof fieldOptions>;
+export type UserType = InferSelectModel<typeof users>;
 
 export type FieldType =
   | "RadioGroup"

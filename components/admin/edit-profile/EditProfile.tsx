@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useSession } from "next-auth/react";
+import { UserType } from "@/types/form-types";
 
 const schema = z
   .object({
@@ -57,16 +57,20 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
-export default function EditProfile() {
+type UserWithoutPass = Omit<UserType, "password"> | null;
+
+type Props = { user: UserWithoutPass };
+
+export default function EditProfile({ user }: Props) {
   const { toast } = useToast();
+
   const [loading, setLoading] = useState(false);
-  const session = useSession();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      email: "",
+      name: user?.name || "",
+      email: user?.email || "",
       oldPassword: "",
       newPassword: "",
       passwordConfirmation: "",
@@ -116,19 +120,6 @@ export default function EditProfile() {
       setLoading(false);
     }
   };
-
-  React.useEffect(() => {
-    if (session) {
-      form.reset({
-        name: session?.data?.user?.name || "",
-        email: session?.data?.user?.email || "",
-        oldPassword: "",
-        newPassword: "",
-        passwordConfirmation: "",
-        image: undefined,
-      });
-    }
-  }, [form, session]);
 
   return (
     <Form {...form}>
