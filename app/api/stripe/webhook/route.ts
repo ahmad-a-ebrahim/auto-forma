@@ -7,9 +7,9 @@ import {
 
 const relevantEvents = new Set([
   "checkout.session.completed",
-  "subscription_schedule.updated",
-  "subscription_schedule.canceled",
-  "subscription_schedule.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+  "customer.subscription.created",
 ]);
 
 export async function POST(req: Request) {
@@ -69,10 +69,10 @@ export async function POST(req: Request) {
         break;
       }
 
-      case "subscription_schedule.created": {
-        const subscription = event.data.object as Stripe.SubscriptionSchedule;
+      case "customer.subscription.created": {
+        const subscription = event.data.object as Stripe.Subscription;
         console.log(
-          "[Webhook] subscription_schedule.created for customer:",
+          "[Webhook] customer.subscription.created for customer:",
           subscription.customer
         );
         await createSubscription({
@@ -81,10 +81,10 @@ export async function POST(req: Request) {
         break;
       }
 
-      case "subscription_schedule.canceled": {
-        const subscription = event.data.object as Stripe.SubscriptionSchedule;
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
         console.log(
-          "[Webhook] subscription_schedule.canceled for customer:",
+          "[Webhook] customer.subscription.deleted for customer:",
           subscription.customer
         );
         await deleteSubscription({
@@ -93,10 +93,10 @@ export async function POST(req: Request) {
         break;
       }
 
-      case "subscription_schedule.updated": {
-        const subscription = event.data.object as Stripe.SubscriptionSchedule;
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
         console.log(
-          "[Webhook] subscription_schedule.updated for customer:",
+          "[Webhook] customer.subscription.updated for customer:",
           subscription.customer
         );
         // هنا ممكن تعمل update حسب احتياجاتك
